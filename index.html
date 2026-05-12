@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>PhishGuard AI | MLH Gen AI Project</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: #f1f5f9;
+        }
+
+        .navbar {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-bottom: 1px solid #334155;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .logo i {
+            color: #3b82f6;
+            margin-right: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #cbd5e1;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 12px rgba(59,130,246,0.4);
+        }
+
+        .nav-btn:hover:not(.active) {
+            background: #334155;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .page.active-page {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 2rem;
+            border: 1px solid #334155;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .scan-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #94a3b8;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active-tab {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active-pane {
+            display: block;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+
+        .input-group input, .input-group textarea {
+            flex: 1;
+            padding: 1rem;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            font-size: 1rem;
+            color: white;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .input-group textarea {
+            min-height: 120px;
+        }
+
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .scan-btn {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .scan-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 8px 24px rgba(59,130,246,0.5);
+        }
+
+        .scan-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .result-alert {
+            margin-top: 1.5rem;
+            padding: 1.2rem;
+            border-radius: 20px;
+            display: none;
+        }
+
+        .result-alert.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-danger {
+            background: rgba(220, 38, 38, 0.2);
+            border: 1px solid #ef4444;
+            color: #fecaca;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+            color: #bbf7d0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 1.5rem;
+            border-radius: 24px;
+            text-align: center;
+            border: 1px solid #334155;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            color: #3b82f6;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .chart-container {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 1rem;
+            border-radius: 24px;
+            margin-bottom: 2rem;
+        }
+
+        canvas {
+            max-height: 300px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #334155;
+        }
+
+        th {
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .badge.phish {
+            background: #ef4444;
+            color: white;
+        }
+
+        .badge.safe {
+            background: #22c55e;
+            color: white;
+        }
+
+        .badge.high {
+            background: #dc2626;
+        }
+
+        .badge.medium {
+            background: #f59e0b;
+        }
+
+        .badge.low {
+            background: #eab308;
+        }
+
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 1px solid #334155;
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            .navbar {
+                flex-direction: column;
+            }
+            .input-group {
+                flex-direction: column;
+            }
+            .scan-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo">
+        <i class="fas fa-shield-hog"></i> PhishGuard AI
+    </div>
+    <div class="nav-links">
+        <button class="nav-btn active" data-page="home"><i class="fas fa-search"></i> Scanner</button>
+        <button class="nav-btn" data-page="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
+    </div>
+</div>
+
+<div class="container">
+    <!-- HOME PAGE -->
+    <div id="home-page" class="page active-page">
+        <div class="card">
+            <h2><i class="fas fa-robot"></i> AI-Powered Phishing Detector</h2>
+            <p style="color:#94a3b8; margin-top: 0.5rem;">Paste a URL or email content — AI will analyze for phishing threats</p>
+
+            <div class="scan-tabs">
+                <button class="tab-btn active-tab" data-tab="url">🌐 URL Scan</button>
+                <button class="tab-btn" data-tab="email">✉️ Email Text Scan</button>
+            </div>
+
+            <div id="url-pane" class="tab-pane active-pane">
+                <div class="input-group">
+                    <input type="text" id="url-input" placeholder="https://example.com/suspicious-link" />
+                </div>
+            </div>
+
+            <div id="email-pane" class="tab-pane">
+                <div class="input-group">
+                    <textarea id="email-input" placeholder="Paste email content here...&#10;&#10;Example:&#10;Dear user, your account will be suspended unless you verify immediately at http://fake-bank-verify.com ..."></textarea>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <button id="scan-btn" class="scan-btn"><i class="fas fa-microchip"></i> <span id="scan-text">Scan for Threats</span></button>
+            </div>
+
+            <div id="result-box" class="result-alert"></div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD PAGE -->
+    <div id="dashboard-page" class="page">
+        <div class="card">
+            <h2><i class="fas fa-chart-simple"></i> Admin Dashboard</h2>
+            <p style="margin-bottom: 1.5rem;">Real-time phishing detection statistics</p>
+
+            <div class="stats-grid" id="stats-grid">
+                <div class="stat-card"><i class="fas fa-chart-line"></i><div class="stat-number" id="total-scans">—</div><div class="stat-label">Total Scans</div></div>
+                <div class="stat-card"><i class="fas fa-check-circle"></i><div class="stat-number" id="safe-scans">—</div><div class="stat-label">Safe Links</div></div>
+                <div class="stat-card"><i class="fas fa-skull-crossbones"></i><div class="stat-number" id="phish-scans">—</div><div class="stat-label">Phishing Links</div></div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="stats-chart" width="400" height="200"></canvas>
+            </div>
+
+            <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+            <div class="table-wrapper">
+                <table id="recent-table">
+                    <thead>
+                        <tr><th>URL</th><th>Status</th><th>Threat Level</th><th>Time</th></tr>
+                    </thead>
+                    <tbody id="recent-tbody">
+                        <tr><td colspan="4" style="text-align:center;">Loading data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer id="main-footer">
+    <i class="fas fa-code"></i> <span id="credits-text">Made by Naishal & Sruthika</span> | MLH Gen AI Project
+</footer>
+
+<script>
+    // ========================
+    // CONFIGURATION
+    // ========================
+    // Change this to your backend URL
+    const API_BASE_URL = "https://phishguard-backend-n7rj.onrender.com";
+
+    let statsChart = null;
+    let currentScanType = "url";
+
+    // DOM Elements
+    const homePage = document.getElementById('home-page');
+    const dashboardPage = document.getElementById('dashboard-page');
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const urlPane = document.getElementById('url-pane');
+    const emailPane = document.getElementById('email-pane');
+    const urlInput = document.getElementById('url-input');
+    const emailInput = document.getElementById('email-input');
+    const scanBtn = document.getElementById('scan-btn');
+    const scanTextSpan = document.getElementById('scan-text');
+    const resultBox = document.getElementById('result-box');
+
+    // Navigation
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const page = btn.dataset.page;
+            navBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (page === 'home') {
+                homePage.classList.add('active-page');
+                dashboardPage.classList.remove('active-page');
+            } else {
+                homePage.classList.remove('active-page');
+                dashboardPage.classList.add('active-page');
+                loadDashboardData();
+            }
+        });
+    });
+
+    // Tab switching
+    tabBtns.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabId = tab.dataset.tab;
+            currentScanType = tabId;
+            tabBtns.forEach(t => t.classList.remove('active-tab'));
+            tab.classList.add('active-tab');
+            if (tabId === 'url') {
+                urlPane.classList.add('active-pane');
+                emailPane.classList.remove('active-pane');
+            } else {
+                urlPane.classList.remove('active-pane');
+                emailPane.classList.add('active-pane');
+            }
+            resultBox.classList.remove('show');
+        });
+    });
+
+    // Show result in UI
+    function showResult(messageHtml, type, threatLevel = null) {
+        resultBox.innerHTML = messageHtml;
+        resultBox.classList.remove('alert-danger', 'alert-success', 'show');
+        if (type === 'danger') {
+            resultBox.classList.add('alert-danger');
+        } else {
+            resultBox.classList.add('alert-success');
+        }
+        resultBox.classList.add('show');
+        
+        // Auto scroll to result
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Perform scan
+    async function performScan() {
+        let endpoint = "";
+        let body = {};
+        let inputValue = "";
+
+        if (currentScanType === "url") {
+            inputValue = urlInput.value.trim();
+            if (!inputValue) {
+                showResult("❌ Please enter a URL to scan", "danger");
+                return;
+            }
+            endpoint = `${API_BASE_URL}/api/scan`;
+            body = { url_to_scan: inputValue };
+        } else {
+            inputValue = emailInput.value.trim();
+            if (!inputValue) {
+                showResult("❌ Please enter email text to scan", "danger");
+                return;
+            }
+            endpoint = `${API_BASE_URL}/api/scan-email`;
+            body = { email_text: inputValue };
+        }
+
+        // Show loading
+        scanBtn.disabled = true;
+        scanTextSpan.innerHTML = '<span class="loader"></span> AI is thinking...';
+
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || `HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("API Response:", data);
+
+            // Update footer credits
+            if (data.credits) {
+                document.getElementById('credits-text').innerText = data.credits;
+            }
+
+            // Display result based on is_phishing flag
+            const isPhishing = data.is_phishing;
+            const threatLevel = data.threat_level || (isPhishing ? "High" : "Safe");
+            const reason = data.reason || "No reason provided";
+
+            if (isPhishing) {
+                let threatIcon = "⚠️";
+                if (threatLevel === "High") threatIcon = "🔴";
+                else if (threatLevel === "Medium") threatIcon = "🟠";
+                else threatIcon = "🟡";
+                
+                showResult(`
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <span style="font-size: 2rem;">${threatIcon}</span>
+                        <div>
+                            <strong style="font-size: 1.2rem;">⚠️ PHISHING DETECTED!</strong><br>
+                            <strong>Threat Level:</strong> <span style="color: #ef4444;">${threatLevel}</span><br>
+                            <strong>Reason:</strong> ${reason}<br>
+                            <i class="fas fa-shield-alt"></i> Do NOT click this link or reply to this email.
+                        </div>
+                    </div>
+                `, "danger");
+            } else {
+                showResult(`
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <span style="font-size: 2rem;">✅</span>
+                        <div>
+                            <strong style="font-size: 1.2rem;">SAFE / LEGITIMATE</strong><br>
+                            <strong>Threat Level:</strong> <span style="color: #22c55e;">${threatLevel}</span><br>
+                            <strong>Reason:</strong> ${reason}<br>
+                            <i class="fas fa-check-circle"></i> This seems safe to interact with.
+                        </div>
+                    </div>
+                `, "success");
+            }
+
+            // Refresh dashboard if needed
+            if (dashboardPage.classList.contains('active-page')) {
+                loadDashboardData();
+            }
+
+        } catch (error) {
+            console.error("Scan error:", error);
+            showResult(`
+                <div>
+                    <strong>❌ API Error</strong><br>
+                    ${error.message}<br>
+                    <small>Make sure backend is running at ${API_BASE_URL}</small>
+                </div>
+            `, "danger");
+        } finally {
+            scanBtn.disabled = false;
+            scanTextSpan.innerHTML = '<i class="fas fa-microchip"></i> Scan for Threats';
+        }
+    }
+
+    // Load dashboard stats
+    async function loadDashboardData() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/stats`);
+            if (!response.ok) throw new Error("Failed to fetch stats");
+            
+            const data = await response.json();
+            console.log("Dashboard data:", data);
+
+            // Update stat boxes
+            const totalScans = data.total_scans || 0;
+            const safeLinks = data.safe_links || 0;
+            const phishingLinks = data.phishing_links || 0;
+
+            document.getElementById('total-scans').innerText = totalScans;
+            document.getElementById('safe-scans').innerText = safeLinks;
+            document.getElementById('phish-scans').innerText = phishingLinks;
+
+            // Update chart
+            if (statsChart) {
+                statsChart.data.datasets[0].data = [safeLinks, phishingLinks];
+                statsChart.update();
+            } else {
+                const ctx = document.getElementById('stats-chart').getContext('2d');
+                statsChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Safe Links', 'Phishing Links'],
+                        datasets: [{
+                            data: [safeLinks, phishingLinks],
+                            backgroundColor: ['#22c55e', '#ef4444'],
+                            borderWidth: 0,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { 
+                                position: 'bottom', 
+                                labels: { color: '#cbd5e1', font: { size: 14 } }
+                            },
+                            tooltip: { bodyColor: '#cbd5e1', backgroundColor: '#1e293b' }
+                        }
+                    }
+                });
+            }
+
+            // Update recent activity table
+            const recentActivity = data.recent_activity || [];
+            const tbody = document.getElementById('recent-tbody');
+            
+            if (recentActivity.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No scans yet</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = "";
+            recentActivity.forEach(scan => {
+                const row = tbody.insertRow();
+                const urlCell = row.insertCell(0);
+                const statusCell = row.insertCell(1);
+                const threatCell = row.insertCell(2);
+                const timeCell = row.insertCell(3);
+
+                // Truncate URL
+                let url = scan.url || "N/A";
+                let displayUrl = url.length > 50 ? url.substring(0, 47) + "..." : url;
+                urlCell.innerHTML = `<a href="#" style="color: #60a5fa; text-decoration: none;" title="${url}">${displayUrl}</a>`;
+                
+                const isPhishing = scan.is_phishing;
+                statusCell.innerHTML = isPhishing 
+                    ? '<span class="badge phish"><i class="fas fa-skull"></i> Phishing</span>'
+                    : '<span class="badge safe"><i class="fas fa-check"></i> Safe</span>';
+                
+                const threatLevel = scan.threat_level || (isPhishing ? "High" : "Low");
+                let threatClass = "badge";
+                if (threatLevel === "High") threatClass += " phish";
+                else if (threatLevel === "Medium") threatClass += " medium";
+                else threatClass += " low";
+                
+                threatCell.innerHTML = `<span class="${threatClass}">${threatLevel}</span>`;
+                timeCell.innerHTML = scan.timestamp || new Date().toLocaleString();
+            });
+
+            // Update footer credits if available
+            if (data.credits) {
+                document.getElementById('credits-text').innerText = data.credits;
+            }
+
+        } catch (error) {
+            console.error("Dashboard error:", error);
+            document.getElementById('recent-tbody').innerHTML = '<tr><td colspan="4" style="text-align:center;">⚠️ Could not connect to backend. Make sure Flask server is running on port 5000</td></tr>';
+            document.getElementById('total-scans').innerText = "?";
+            document.getElementById('safe-scans').innerText = "?";
+            document.getElementById('phish-scans').innerText = "?";
+        }
+    }
+
+    // Event listeners
+    scanBtn.addEventListener('click', performScan);
+    
+    // Enter key support
+    urlInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') performScan();
+    });
+    
+    // Ctrl+Enter for textarea
+    emailInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            performScan();
+        }
+    });
+
+    // Initial load
+    console.log(`🚀 PhishGuard AI Frontend Ready! Backend URL: ${API_BASE_URL}`);
+</script>
+</body>
+</html>
