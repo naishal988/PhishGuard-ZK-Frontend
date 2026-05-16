@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>PhishGuard AI | MLH Gen AI Project</title>
-    <!-- Font Awesome -->
+    <title>PhishGuard ZK | Midnight Hackathon</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * {
@@ -237,6 +235,22 @@
             color: #bbf7d0;
         }
 
+        .privacy-box {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            border: 1px dashed #64748b;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .privacy-box span {
+            color: #60a5fa;
+            word-break: break-all;
+            font-family: monospace;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -368,20 +382,19 @@
 
 <div class="navbar">
     <div class="logo">
-        <i class="fas fa-shield-hog"></i> PhishGuard AI
+        <i class="fas fa-shield-halved"></i> PhishGuard ZK
     </div>
     <div class="nav-links">
         <button class="nav-btn active" data-page="home"><i class="fas fa-search"></i> Scanner</button>
-        <button class="nav-btn" data-page="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
+        <button class="nav-btn" data-page="dashboard"><i class="fas fa-chart-pie"></i> ZK-Dashboard</button>
     </div>
 </div>
 
 <div class="container">
-    <!-- HOME PAGE -->
     <div id="home-page" class="page active-page">
         <div class="card">
-            <h2><i class="fas fa-robot"></i> AI-Powered Phishing Detector</h2>
-            <p style="color:#94a3b8; margin-top: 0.5rem;">Paste a URL or email content — AI will analyze for phishing threats</p>
+            <h2><i class="fas fa-user-secret"></i> Privacy-Preserving Threat Detector</h2>
+            <p style="color:#94a3b8; margin-top: 0.5rem;">We scan your URLs and emails without storing the underlying sensitive data.</p>
 
             <div class="scan-tabs">
                 <button class="tab-btn active-tab" data-tab="url">🌐 URL Scan</button>
@@ -401,34 +414,33 @@
             </div>
 
             <div style="text-align: center;">
-                <button id="scan-btn" class="scan-btn"><i class="fas fa-microchip"></i> <span id="scan-text">Scan for Threats</span></button>
+                <button id="scan-btn" class="scan-btn"><i class="fas fa-microchip"></i> <span id="scan-text">Scan Securely</span></button>
             </div>
 
             <div id="result-box" class="result-alert"></div>
         </div>
     </div>
 
-    <!-- DASHBOARD PAGE -->
     <div id="dashboard-page" class="page">
         <div class="card">
-            <h2><i class="fas fa-chart-simple"></i> Admin Dashboard</h2>
-            <p style="margin-bottom: 1.5rem;">Real-time phishing detection statistics</p>
+            <h2><i class="fas fa-server"></i> Zero-Knowledge Dashboard</h2>
+            <p style="margin-bottom: 1.5rem;">Real-time network statistics (Data fully anonymized)</p>
 
             <div class="stats-grid" id="stats-grid">
-                <div class="stat-card"><i class="fas fa-chart-line"></i><div class="stat-number" id="total-scans">—</div><div class="stat-label">Total Scans</div></div>
-                <div class="stat-card"><i class="fas fa-check-circle"></i><div class="stat-number" id="safe-scans">—</div><div class="stat-label">Safe Links</div></div>
-                <div class="stat-card"><i class="fas fa-skull-crossbones"></i><div class="stat-number" id="phish-scans">—</div><div class="stat-label">Phishing Links</div></div>
+                <div class="stat-card"><i class="fas fa-fingerprint"></i><div class="stat-number" id="total-scans">—</div><div class="stat-label">Total Hashes Verified</div></div>
+                <div class="stat-card"><i class="fas fa-check-circle"></i><div class="stat-number" id="safe-scans">—</div><div class="stat-label">Safe Logs</div></div>
+                <div class="stat-card"><i class="fas fa-skull-crossbones"></i><div class="stat-number" id="phish-scans">—</div><div class="stat-label">Threats Blocked</div></div>
             </div>
 
             <div class="chart-container">
                 <canvas id="stats-chart" width="400" height="200"></canvas>
             </div>
 
-            <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+            <h3><i class="fas fa-link"></i> Recent Secured Hashes (ZK-Logs)</h3>
             <div class="table-wrapper">
                 <table id="recent-table">
                     <thead>
-                        <tr><th>URL</th><th>Status</th><th>Threat Level</th><th>Time</th></tr>
+                        <tr><th>Anonymized ZK-Hash</th><th>Status</th><th>Threat Level</th><th>Time</th></tr>
                     </thead>
                     <tbody id="recent-tbody">
                         <tr><td colspan="4" style="text-align:center;">Loading data...</td></tr>
@@ -440,14 +452,13 @@
 </div>
 
 <footer id="main-footer">
-    <i class="fas fa-code"></i> <span id="credits-text">Made by Naishal & Sruthika</span> | MLH Gen AI Project
+    <i class="fas fa-code"></i> <span id="credits-text">Made by Naishal & Sruthika</span> | MLH Midnight Hackathon
 </footer>
 
 <script>
     // ========================
     // CONFIGURATION
     // ========================
-    // Change this to your backend URL
     const API_BASE_URL = "https://phishguard-backend-n7rj.onrender.com";
 
     let statsChart = null;
@@ -501,8 +512,8 @@
         });
     });
 
-    // Show result in UI
-    function showResult(messageHtml, type, threatLevel = null) {
+    // Show result in UI (Now updated with Privacy Info)
+    function showResult(messageHtml, type) {
         resultBox.innerHTML = messageHtml;
         resultBox.classList.remove('alert-danger', 'alert-success', 'show');
         if (type === 'danger') {
@@ -511,8 +522,6 @@
             resultBox.classList.add('alert-success');
         }
         resultBox.classList.add('show');
-        
-        // Auto scroll to result
         resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
@@ -540,9 +549,8 @@
             body = { email_text: inputValue };
         }
 
-        // Show loading
         scanBtn.disabled = true;
-        scanTextSpan.innerHTML = '<span class="loader"></span> AI is thinking...';
+        scanTextSpan.innerHTML = '<span class="loader"></span> Scanning Securely...';
 
         try {
             const response = await fetch(endpoint, {
@@ -559,15 +567,25 @@
             const data = await response.json();
             console.log("API Response:", data);
 
-            // Update footer credits
             if (data.credits) {
                 document.getElementById('credits-text').innerText = data.credits;
             }
 
-            // Display result based on is_phishing flag
             const isPhishing = data.is_phishing;
             const threatLevel = data.threat_level || (isPhishing ? "High" : "Safe");
             const reason = data.reason || "No reason provided";
+            
+            // New Privacy Shield Variables from our Backend
+            const zkHash = data.zk_proof_hash || "N/A";
+            const privacyStatus = data.privacy_status || "Data scrubbed from server.";
+
+            // Privacy Box HTML to append to both results
+            const privacyBoxHtml = `
+                <div class="privacy-box">
+                    <div style="margin-bottom: 5px;"><i class="fas fa-lock"></i> <strong>Privacy Guard:</strong> ${privacyStatus}</div>
+                    <div><i class="fas fa-fingerprint"></i> <strong>Blockchain ZK-Hash:</strong> <span>${zkHash}</span></div>
+                </div>
+            `;
 
             if (isPhishing) {
                 let threatIcon = "⚠️";
@@ -576,31 +594,32 @@
                 else threatIcon = "🟡";
                 
                 showResult(`
-                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                        <span style="font-size: 2rem;">${threatIcon}</span>
-                        <div>
+                    <div style="display: flex; align-items: flex-start; gap: 15px; flex-wrap: wrap;">
+                        <span style="font-size: 2.5rem; margin-top: 5px;">${threatIcon}</span>
+                        <div style="flex: 1;">
                             <strong style="font-size: 1.2rem;">⚠️ PHISHING DETECTED!</strong><br>
                             <strong>Threat Level:</strong> <span style="color: #ef4444;">${threatLevel}</span><br>
                             <strong>Reason:</strong> ${reason}<br>
-                            <i class="fas fa-shield-alt"></i> Do NOT click this link or reply to this email.
+                            <div style="margin-top: 8px;"><i class="fas fa-shield-alt"></i> Do NOT click this link or reply to this email.</div>
+                            ${privacyBoxHtml}
                         </div>
                     </div>
                 `, "danger");
             } else {
                 showResult(`
-                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                        <span style="font-size: 2rem;">✅</span>
-                        <div>
+                    <div style="display: flex; align-items: flex-start; gap: 15px; flex-wrap: wrap;">
+                        <span style="font-size: 2.5rem; margin-top: 5px;">✅</span>
+                        <div style="flex: 1;">
                             <strong style="font-size: 1.2rem;">SAFE / LEGITIMATE</strong><br>
                             <strong>Threat Level:</strong> <span style="color: #22c55e;">${threatLevel}</span><br>
                             <strong>Reason:</strong> ${reason}<br>
-                            <i class="fas fa-check-circle"></i> This seems safe to interact with.
+                            <div style="margin-top: 8px;"><i class="fas fa-check-circle"></i> This seems safe to interact with.</div>
+                            ${privacyBoxHtml}
                         </div>
                     </div>
                 `, "success");
             }
 
-            // Refresh dashboard if needed
             if (dashboardPage.classList.contains('active-page')) {
                 loadDashboardData();
             }
@@ -616,7 +635,7 @@
             `, "danger");
         } finally {
             scanBtn.disabled = false;
-            scanTextSpan.innerHTML = '<i class="fas fa-microchip"></i> Scan for Threats';
+            scanTextSpan.innerHTML = '<i class="fas fa-microchip"></i> Scan Securely';
         }
     }
 
@@ -629,7 +648,6 @@
             const data = await response.json();
             console.log("Dashboard data:", data);
 
-            // Update stat boxes
             const totalScans = data.total_scans || 0;
             const safeLinks = data.safe_links || 0;
             const phishingLinks = data.phishing_links || 0;
@@ -638,7 +656,6 @@
             document.getElementById('safe-scans').innerText = safeLinks;
             document.getElementById('phish-scans').innerText = phishingLinks;
 
-            // Update chart
             if (statsChart) {
                 statsChart.data.datasets[0].data = [safeLinks, phishingLinks];
                 statsChart.update();
@@ -647,7 +664,7 @@
                 statsChart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Safe Links', 'Phishing Links'],
+                        labels: ['Safe Logs', 'Threats Blocked'],
                         datasets: [{
                             data: [safeLinks, phishingLinks],
                             backgroundColor: ['#22c55e', '#ef4444'],
@@ -669,27 +686,25 @@
                 });
             }
 
-            // Update recent activity table
             const recentActivity = data.recent_activity || [];
             const tbody = document.getElementById('recent-tbody');
             
             if (recentActivity.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No scans yet</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No secure logs generated yet</td></tr>';
                 return;
             }
 
             tbody.innerHTML = "";
             recentActivity.forEach(scan => {
                 const row = tbody.insertRow();
-                const urlCell = row.insertCell(0);
+                const hashCell = row.insertCell(0);
                 const statusCell = row.insertCell(1);
                 const threatCell = row.insertCell(2);
                 const timeCell = row.insertCell(3);
 
-                // Truncate URL
-                let url = scan.url || "N/A";
-                let displayUrl = url.length > 50 ? url.substring(0, 47) + "..." : url;
-                urlCell.innerHTML = `<a href="#" style="color: #60a5fa; text-decoration: none;" title="${url}">${displayUrl}</a>`;
+                // Displaying the anonymized ZK-Hash
+                let hashStr = scan.url || "N/A";
+                hashCell.innerHTML = `<span style="color: #a78bfa; font-family: monospace;">${hashStr}</span>`;
                 
                 const isPhishing = scan.is_phishing;
                 statusCell.innerHTML = isPhishing 
@@ -706,37 +721,29 @@
                 timeCell.innerHTML = scan.timestamp || new Date().toLocaleString();
             });
 
-            // Update footer credits if available
             if (data.credits) {
                 document.getElementById('credits-text').innerText = data.credits;
             }
 
         } catch (error) {
             console.error("Dashboard error:", error);
-            document.getElementById('recent-tbody').innerHTML = '<tr><td colspan="4" style="text-align:center;">⚠️ Could not connect to backend. Make sure Flask server is running on port 5000</td></tr>';
-            document.getElementById('total-scans').innerText = "?";
-            document.getElementById('safe-scans').innerText = "?";
-            document.getElementById('phish-scans').innerText = "?";
+            document.getElementById('recent-tbody').innerHTML = '<tr><td colspan="4" style="text-align:center;">⚠️ Could not connect to backend. Make sure Flask server is running on Render.</td></tr>';
         }
     }
 
-    // Event listeners
     scanBtn.addEventListener('click', performScan);
     
-    // Enter key support
     urlInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') performScan();
     });
     
-    // Ctrl+Enter for textarea
     emailInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
             performScan();
         }
     });
 
-    // Initial load
-    console.log(`🚀 PhishGuard AI Frontend Ready! Backend URL: ${API_BASE_URL}`);
+    console.log(`🚀 PhishGuard ZK Frontend Ready! Backend URL: ${API_BASE_URL}`);
 </script>
 </body>
 </html>
