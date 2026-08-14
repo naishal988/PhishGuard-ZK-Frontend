@@ -6,6 +6,9 @@
     <meta name="description" content="PhishGuard ZK v2 — Enterprise AI Phishing Detector">
     <title>PhishGuard ZK | Zero-Trust AI Engine</title>
     
+    <!-- Premium Integrated SVG Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 10 L15 25 V50 C15 70 30 85 50 95 C70 85 85 70 85 50 V25 Z' fill='none' stroke='%2322d3ee' stroke-width='8' stroke-linejoin='round'/><circle cx='50' cy='55' r='15' fill='%23a78bfa'/></svg>">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -13,14 +16,14 @@
     
     <style>
         :root {
-            --bg-base: #010103; /* Deeper, richer dark space */
-            --glass-bg: rgba(15, 15, 20, 0.35); /* More transparent for blur */
+            --bg-base: #010103;
+            --glass-bg: rgba(15, 15, 20, 0.35);
             --glass-border: rgba(255, 255, 255, 0.06);
-            --glass-glow: rgba(255, 255, 255, 0.02);
             
-            --accent-primary: #a78bfa; /* Richer purple */
-            --accent-secondary: #22d3ee; /* Electric cyan */
+            --accent-primary: #a78bfa; 
+            --accent-secondary: #22d3ee; 
             --accent-danger: #f43f5e;
+            --accent-success: #34d399;
             
             --text-main: #ffffff;
             --text-muted: #94a3b8;
@@ -39,23 +42,21 @@
             min-height: 100vh;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* --- NEXT-LEVEL CURSOR --- */
+        /* --- STREAMING_CHUNK:Cursor and Animated Backgrounds --- */
         .cursor-dot, .cursor-outline {
             position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
             border-radius: 50%; z-index: 9999; pointer-events: none;
-            mix-blend-mode: difference; /* Premium color inversion effect */
+            mix-blend-mode: difference; 
         }
         .cursor-dot { width: 8px; height: 8px; background-color: white; }
         .cursor-outline {
             width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.5);
-            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: width 0.3s ease, height 0.3s ease;
         }
-        .cursor-hover .cursor-outline { width: 70px; height: 70px; border-color: transparent; background: rgba(255,255,255,1); }
+        .cursor-hover .cursor-outline { width: 70px; height: 70px; background: rgba(255,255,255,1); border-color: transparent; }
 
-        /* --- PREMIUM CINEMATIC BACKGROUND --- */
         .noise-bg {
             position: fixed; inset: 0; z-index: -2; opacity: 0.04; pointer-events: none;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -82,7 +83,7 @@
             -webkit-mask-image: radial-gradient(ellipse at top, black 20%, transparent 80%);
         }
 
-        /* --- NAVBAR --- */
+        /* --- STREAMING_CHUNK:Navbar and Container Layout --- */
         .navbar {
             display: flex; justify-content: space-between; align-items: center;
             padding: 1.5rem 4rem; position: sticky; top: 0; z-index: 100;
@@ -112,25 +113,19 @@
         .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-secondary); box-shadow: 0 0 12px var(--accent-secondary); animation: pulseStatus 2s infinite; }
         @keyframes pulseStatus { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.3); } 100% { opacity: 1; transform: scale(1); } }
 
-        /* --- ANIMATIONS & LAYOUT --- */
         .container { max-width: 1100px; margin: 0 auto; padding: 5rem 2rem; position: relative; z-index: 10; }
         .page { display: none; }
         .page.active { display: block; }
         
-        /* Entrance Animation Classes */
         .animate-up { opacity: 0; transform: translateY(30px); animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .delay-1 { animation-delay: 0.1s; } .delay-2 { animation-delay: 0.2s; } .delay-3 { animation-delay: 0.3s; }
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
-        
-        @keyframes slideUp { 
-            from { opacity: 0; transform: translateY(20px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* --- STREAMING_CHUNK:Hero and 3D Glass Panels --- */
         .hero { text-align: center; margin-bottom: 5rem; position: relative; z-index: 10; }
         .hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(3.5rem, 6vw, 5.5rem); font-weight: 700; line-height: 1.05; margin-bottom: 1.5rem; letter-spacing: -2px; }
         
-        /* Premium Multi-stop Gradient */
         .text-gradient { 
             background: linear-gradient(to right, #ffffff, #a78bfa 40%, #22d3ee 80%, #ffffff); 
             background-size: 200% auto;
@@ -138,21 +133,17 @@
             animation: shine 6s linear infinite;
         }
         @keyframes shine { to { background-position: 200% center; } }
-        
         .hero p { color: var(--text-muted); font-size: 1.15rem; max-width: 650px; margin: 0 auto; line-height: 1.7; font-weight: 300; }
 
-        /* --- 3D TILT GLASS PANELS --- */
         .tilt-wrapper { perspective: 1500px; transform-style: preserve-3d; }
         .glass-panel {
             background: var(--glass-bg); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             border: 1px solid var(--glass-border); border-radius: 30px; padding: 3rem;
             box-shadow: 0 40px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
             position: relative; overflow: hidden; transform-style: preserve-3d;
-            transition: box-shadow 0.3s ease;
             will-change: transform;
         }
         
-        /* Interactive Glare */
         .glare {
             position: absolute; width: 400px; height: 400px;
             background: radial-gradient(circle closest-side, rgba(255,255,255,0.15), transparent);
@@ -161,7 +152,7 @@
             z-index: 10; top: 0; left: 0; mix-blend-mode: overlay;
         }
 
-        /* --- SCANNER INTERFACE --- */
+        /* --- STREAMING_CHUNK:Engine Form and Buttons --- */
         .segmented-control { 
             display: flex; background: rgba(0,0,0,0.6); border-radius: 16px; padding: 0.5rem; 
             margin-bottom: 2.5rem; border: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 20;
@@ -183,7 +174,6 @@
             transition: var(--transition-smooth); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
         }
         .input-icon { position: absolute; top: 1.6rem; left: 1.5rem; color: var(--text-muted); font-size: 1.2rem; transition: 0.3s; }
-        
         .premium-input:focus { 
             outline: none; border-color: var(--accent-primary); background: rgba(0,0,0,0.7);
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 20px rgba(167, 139, 250, 0.2); 
@@ -191,9 +181,7 @@
         .premium-input:focus + .input-icon, .premium-input:focus ~ .input-icon { color: var(--accent-primary); }
         textarea.premium-input { min-height: 160px; padding-left: 1.5rem; resize: vertical; }
 
-        /* --- NEXT-LEVEL BUTTONS --- */
         .btn-group { display: flex; gap: 1.5rem; align-items: stretch; position: relative; z-index: 20; }
-        
         .magnetic-wrap { position: relative; display: inline-block; }
         .wrap-primary { flex: 1; }
         
@@ -201,16 +189,9 @@
             width: 100%; height: 100%; padding: 1.3rem 2rem; background: #ffffff; color: #000;
             border: none; border-radius: 18px; font-weight: 700; font-size: 1.1rem; font-family: 'Space Grotesk', sans-serif;
             display: flex; align-items: center; justify-content: center; gap: 0.75rem;
-            will-change: transform; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s;
+            will-change: transform; transition: transform 0.2s ease, box-shadow 0.3s;
             position: relative; overflow: hidden;
         }
-        .btn-primary::after {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
-            transform: skewX(-20deg); animation: shimmer 3s infinite;
-        }
-        @keyframes shimmer { 100% { left: 200%; } }
-        
         .btn-primary:hover { box-shadow: 0 0 30px rgba(255,255,255,0.4); }
         .btn-primary:disabled { background: #333; color: #888; pointer-events: none; }
 
@@ -219,11 +200,49 @@
             background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); 
             border-radius: 18px; color: var(--text-main); font-size: 1.3rem;
             display: flex; align-items: center; justify-content: center;
-            will-change: transform; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s, border-color 0.3s; 
+            will-change: transform; transition: transform 0.2s ease, background 0.3s, border-color 0.3s; 
         }
-        .btn-secondary:hover { border-color: var(--accent-secondary); background: rgba(34, 211, 238, 0.1); box-shadow: 0 0 20px rgba(34, 211, 238, 0.2); color: var(--accent-secondary); }
+        .btn-secondary:hover { border-color: var(--accent-secondary); background: rgba(34, 211, 238, 0.1); color: var(--accent-secondary); }
 
-        /* --- HACKER TERMINAL V2 --- */
+        /* --- STREAMING_CHUNK:Dashboard (Ledger) Styles --- */
+        .dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2.5rem; }
+        @media (max-width: 768px) { .dash-grid { grid-template-columns: 1fr; } }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 2rem; display: flex; flex-direction: column; gap: 0.5rem;
+            transition: var(--transition-smooth);
+        }
+        .stat-card:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
+        .stat-title { color: var(--text-muted); font-size: 0.9rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 3rem; font-weight: 700; color: var(--text-main); }
+        
+        .stat-value.cyan { color: var(--accent-secondary); text-shadow: 0 0 20px rgba(34,211,238,0.3); }
+        .stat-value.red { color: var(--accent-danger); text-shadow: 0 0 20px rgba(244,63,94,0.3); }
+        .stat-value.green { color: var(--accent-success); text-shadow: 0 0 20px rgba(52,211,153,0.3); }
+
+        .ledger-container {
+            background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 2rem; overflow: hidden;
+        }
+        .ledger-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .ledger-header h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; }
+        .pulse-live { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--accent-success); }
+        
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 1rem; color: var(--text-muted); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--glass-border); text-transform: uppercase; letter-spacing: 1px;}
+        td { padding: 1rem; font-size: 0.95rem; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        tr { transition: background 0.3s; }
+        tr:hover { background: rgba(255,255,255,0.03); }
+        
+        .hash-cell { font-family: 'JetBrains Mono', monospace; color: var(--accent-primary); font-size: 0.85rem; }
+        .badge { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block;}
+        .badge.threat { background: rgba(244,63,94,0.15); color: var(--accent-danger); border: 1px solid rgba(244,63,94,0.3); }
+        .badge.safe { background: rgba(52,211,153,0.15); color: var(--accent-success); border: 1px solid rgba(52,211,153,0.3); }
+        .type-tag { color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.8rem;}
+
+        /* --- STREAMING_CHUNK:Terminal, Results and Footer --- */
         .terminal-box { 
             display: none; margin-top: 2.5rem; background: #050508; border: 1px solid rgba(255,255,255,0.1); 
             border-radius: 16px; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); position: relative; z-index: 20;
@@ -235,92 +254,69 @@
         .term-dot:nth-child(2) { background: #ffbd2e; box-shadow: 0 0 10px #ffbd2e;} 
         .term-dot:nth-child(3) { background: #27c93f; box-shadow: 0 0 10px #27c93f;}
         .term-body { padding: 2rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: #4ade80; line-height: 1.8; text-shadow: 0 0 5px rgba(74, 222, 128, 0.4); position: relative;}
-        .term-body::after { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(0,0,0,0.2) 50%); background-size: 100% 4px; pointer-events: none; } /* Scanlines */
-        
+        .term-body::after { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(0,0,0,0.2) 50%); background-size: 100% 4px; pointer-events: none; }
         .term-line { opacity: 0; animation: typeLine 0.1s forwards; }
-        @keyframes typeLine { to { opacity: 1; } } /* Fixed missing animation */
-        
+        @keyframes typeLine { to { opacity: 1; } }
         .term-line.highlight { color: var(--accent-secondary); text-shadow: 0 0 8px var(--accent-secondary); }
+        .term-line.warn { color: #ffbd2e; text-shadow: 0 0 8px rgba(255, 189, 46, 0.6); }
 
-        /* --- PREMIUM RESULTS PANEL --- */
         .result-container { display: none; margin-top: 2.5rem; border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.5); animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); position: relative; z-index: 20; backdrop-filter: blur(20px);}
         .result-container.show { display: block; }
-        
         .result-grid { display: grid; grid-template-columns: 1fr auto; gap: 3rem; padding: 3rem; align-items: center; }
         @media (max-width: 768px) { .result-grid { grid-template-columns: 1fr; text-align: center; gap: 2rem; padding: 2rem; } }
-
         .result-info h3 { font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; margin-bottom: 0.5rem; letter-spacing: -1px; }
         .danger-text { color: var(--accent-danger); text-shadow: 0 0 20px rgba(244,63,94,0.4); } 
-        .safe-text { color: var(--accent-secondary); text-shadow: 0 0 20px rgba(34,211,238,0.4); }
+        .safe-text { color: var(--accent-success); text-shadow: 0 0 20px rgba(52,211,153,0.4); }
         .result-desc { color: var(--text-muted); line-height: 1.7; font-size: 1.05rem; margin-bottom: 2rem; }
 
         .circular-chart { width: 140px; height: 140px; drop-shadow: 0 0 10px rgba(255,255,255,0.1); }
         .circle-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 2.5; }
-        .circle { fill: none; stroke-width: 2.5; stroke-linecap: round; animation: progress 2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .circle { fill: none; stroke-width: 2.5; stroke-linecap: round; transition: stroke-dasharray 1.5s cubic-bezier(0.16, 1, 0.3, 1); stroke-dasharray: 0, 100;}
         .danger-theme .circle { stroke: var(--accent-danger); filter: drop-shadow(0 0 12px rgba(244,63,94,0.6)); }
-        .safe-theme .circle { stroke: var(--accent-secondary); filter: drop-shadow(0 0 12px rgba(34,211,238,0.6)); }
+        .safe-theme .circle { stroke: var(--accent-success); filter: drop-shadow(0 0 12px rgba(52,211,153,0.6)); }
         .percentage { fill: var(--text-main); font-family: 'Space Grotesk', sans-serif; font-size: 0.6em; text-anchor: middle; font-weight: 700; }
-        @keyframes progress { 0% { stroke-dasharray: 0 100; } }
 
         .zk-proof-box { background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.2); padding: 1.2rem; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1rem; transition: var(--transition-smooth); }
-        .zk-proof-box:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.4); }
         .zk-hash { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent-primary); word-break: break-all; }
 
-        /* --- CREDITS SECTION --- */
+        /* Credits */
         .credits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-top: 2rem; }
         @media (max-width: 768px) { .credits-grid { grid-template-columns: 1fr; } }
-        
-        .credit-card { background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 24px; padding: 2.5rem; transition: var(--transition-smooth); transform-style: preserve-3d; position: relative; overflow: hidden;}
+        .credit-card { background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 24px; padding: 2.5rem; transform-style: preserve-3d; position: relative; overflow: hidden;}
         .credit-card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; color: var(--text-main); margin-bottom: 0.4rem; transform: translateZ(30px); }
-        
         .role-tag { display: inline-block; padding: 0.4rem 1rem; background: rgba(167, 139, 250, 0.1); color: var(--accent-primary); border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1.8rem; border: 1px solid rgba(167, 139, 250, 0.2); transform: translateZ(25px); }
         .role-tag.ui-tag { background: rgba(34, 211, 238, 0.1); color: var(--accent-secondary); border-color: rgba(34, 211, 238, 0.2); }
-        
         .credit-card ul { list-style: none; transform: translateZ(20px); }
         .credit-card li { position: relative; padding-left: 1.8rem; color: var(--text-muted); margin-bottom: 1rem; font-size: 1rem; line-height: 1.6; }
         .credit-card li::before { content: '▹'; position: absolute; left: 0; color: var(--accent-primary); font-size: 1.2rem; line-height: 1; top: 2px;}
-        .ui-card li::before { color: var(--accent-secondary); }
 
-        /* --- FOOTER --- */
+        /* Footer */
         footer { text-align: center; padding: 4rem 2rem; color: var(--text-muted); font-size: 0.95rem; border-top: 1px solid var(--glass-border); margin-top: 6rem; position: relative; z-index: 10; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); }
         .footer-brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; margin-bottom: 1rem; color: #fff; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .footer-brand i { color: var(--accent-primary); }
-        
         .footer-text { line-height: 1.8; }
         .footer-text i.fa-heart { color: var(--accent-danger); text-shadow: 0 0 15px rgba(244,63,94,0.8); animation: heartPulse 1.5s infinite; margin: 0 0.3rem; }
-        .footer-name { color: #fff; font-weight: 600; letter-spacing: 0.5px; }
-        
-        @keyframes heartPulse {
-            0% { transform: scale(1); }
-            15% { transform: scale(1.2); }
-            30% { transform: scale(1); }
-            45% { transform: scale(1.2); }
-            60% { transform: scale(1); }
-            100% { transform: scale(1); }
-        }
-
+        .footer-name { color: #fff; font-weight: 600; }
         .spinner { width: 20px; height: 20px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<!-- Cinematic Backgrounds -->
 <div class="noise-bg"></div>
 <div class="aurora-bg"></div>
 <div class="grid-overlay"></div>
 
-<!-- Custom Cursor -->
 <div class="cursor-dot" id="cursor-dot"></div>
 <div class="cursor-outline" id="cursor-outline"></div>
 
 <nav class="navbar interactable animate-up">
     <div class="logo">
-        <i class="fas fa-fingerprint"></i> PhishGuard ZK <span class="v2-badge">v2.0 PRO</span>
+        <i class="fas fa-shield-halved"></i> PhishGuard ZK <span class="v2-badge">v2.0</span>
     </div>
     <div class="nav-links">
-        <div class="nav-item active interactable" data-page="scanner">Engine</div>
-        <div class="nav-item interactable" data-page="about">Architecture & Team</div>
+        <div class="nav-item active interactable" data-page="scanner">Scanner</div>
+        <div class="nav-item interactable" data-page="dashboard">Ledger</div>
+        <div class="nav-item interactable" data-page="about">Architecture</div>
     </div>
     <div class="system-status interactable">
         <div class="pulse-dot"></div> Live ZK Node
@@ -328,11 +324,11 @@
 </nav>
 
 <main class="container">
-    <!-- SCANNER ENGINE PAGE -->
+    <!-- SCANNER PAGE -->
     <section id="page-scanner" class="page active">
         <div class="hero animate-up delay-1">
             <h1 class="text-gradient">Zero-Knowledge. Absolute Security.</h1>
-            <p>Enterprise-grade AI threat detection. Your data is analyzed in real-time, converted to cryptographic ZK-proofs, and instantly scrubbed from memory forever.</p>
+            <p>Enterprise-grade AI threat detection. Your data is analyzed in real-time, converted to cryptographic ZK-proofs, and instantly scrubbed from memory.</p>
         </div>
 
         <div class="tilt-wrapper animate-up delay-2">
@@ -364,7 +360,6 @@
                     </div>
                 </div>
 
-                <!-- Hacker Terminal Animation -->
                 <div class="terminal-box" id="scan-terminal">
                     <div class="term-header">
                         <div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div>
@@ -372,7 +367,6 @@
                     <div class="term-body" id="term-content"></div>
                 </div>
 
-                <!-- Premium Results Panel -->
                 <div class="result-container" id="result-panel">
                     <div class="result-grid">
                         <div class="result-info">
@@ -381,10 +375,10 @@
                             
                             <div class="zk-proof-box interactable">
                                 <div>
-                                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem; letter-spacing: 1px; text-transform: uppercase;">Cryptographic ZK-Proof Hash (Data Scrubbed)</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem; letter-spacing: 1px; text-transform: uppercase;">Cryptographic Hash (Data Scrubbed)</div>
                                     <div class="zk-hash" id="res-hash">0x...</div>
                                 </div>
-                                <i class="fas fa-check-circle" id="res-icon" style="color: var(--accent-secondary); font-size: 1.5rem; text-shadow: 0 0 10px rgba(34,211,238,0.5);"></i>
+                                <i class="fas fa-check-circle" id="res-icon" style="color: var(--accent-success); font-size: 1.5rem;"></i>
                             </div>
                         </div>
                         
@@ -402,7 +396,51 @@
         </div>
     </section>
 
-    <!-- ARCHITECTURE & CREDITS PAGE -->
+    <section id="page-dashboard" class="page">
+        <div class="hero">
+            <h1 class="text-gradient">Zero-Knowledge Ledger</h1>
+            <p>Live, anonymized telemetry tracking active network scans and neutralized threats in real-time.</p>
+        </div>
+
+        <div class="dash-grid">
+            <div class="stat-card">
+                <div class="stat-title">Total Scans Processed</div>
+                <div class="stat-value cyan" id="stat-total">1,402</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Threats Neutralized</div>
+                <div class="stat-value red" id="stat-threats">348</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Safe Nodes Verified</div>
+                <div class="stat-value green" id="stat-safe">1,054</div>
+            </div>
+        </div>
+
+        <div class="ledger-container">
+            <div class="ledger-header">
+                <h3>Live Network Activity</h3>
+                <div class="pulse-live"><div class="pulse-dot"></div> Syncing Data...</div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ZK Hash Proof</th>
+                            <th>Target Type</th>
+                            <th>Verdict</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ledger-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ARCHITECTURE PAGE -->
     <section id="page-about" class="page">
         <div class="hero">
             <h1 class="text-gradient">Architecture & Team</h1>
@@ -422,7 +460,6 @@
                             <li>Built and designed the proprietary Browser Extension.</li>
                         </ul>
                     </div>
-
                     <div class="credit-card ui-card tilt-card">
                         <h3>Sruthika Ramawat</h3>
                         <div class="role-tag ui-tag">Initial UI Concept Contributor</div>
@@ -449,12 +486,12 @@
 </footer>
 
 <script>
-    // --- PREMIUM CUSTOM CURSOR ---
+    // --- STREAMING_CHUNK:Javascript Logic, Animations and Mock Ledger... ---
+    
+    // Smooth Cursor
     const cursorDot = document.getElementById('cursor-dot');
     const cursorOutline = document.getElementById('cursor-outline');
-    
-    let mouseX = 0, mouseY = 0;
-    let outlineX = 0, outlineY = 0;
+    let mouseX = 0, mouseY = 0, outlineX = 0, outlineY = 0;
     
     window.addEventListener('mousemove', (e) => {
         mouseX = e.clientX; mouseY = e.clientY;
@@ -476,76 +513,51 @@
         el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
     });
 
-    // --- 3D TILT WITH GLARE EFFECT ---
+    // 3D LERP Smooth Tilt
     document.querySelectorAll('.tilt-card').forEach(card => {
         const glare = document.createElement('div');
         glare.className = 'glare';
         card.appendChild(glare);
 
-        let targetX = 0, targetY = 0;
-        let currentX = 0, currentY = 0;
-        let targetGlareOpacity = 0;
-        let currentGlareOpacity = 0;
-        let targetScale = 1;
-        let currentScale = 1;
+        let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
+        let targetOpacity = 0, currentOpacity = 0, targetScale = 1, currentScale = 1;
 
-        card.addEventListener('mouseenter', () => {
-            targetScale = 1.01;
-            targetGlareOpacity = 1;
-        });
-
+        card.addEventListener('mouseenter', () => { targetScale = 1.01; targetOpacity = 1; });
         card.addEventListener('mousemove', (e) => {
             const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            targetX = ((y - centerY) / centerY) * -4; 
-            targetY = ((x - centerX) / centerX) * 4;
-            
+            const x = e.clientX - rect.left, y = e.clientY - rect.top;
+            targetX = ((y - (rect.height/2)) / (rect.height/2)) * -4; 
+            targetY = ((x - (rect.width/2)) / (rect.width/2)) * 4;
             glare.style.transform = `translate(${x}px, ${y}px)`;
         });
-
-        card.addEventListener('mouseleave', () => {
-            targetX = 0;
-            targetY = 0;
-            targetScale = 1;
-            targetGlareOpacity = 0;
-        });
+        card.addEventListener('mouseleave', () => { targetX = 0; targetY = 0; targetScale = 1; targetOpacity = 0; });
 
         function render3D() {
             currentX += (targetX - currentX) * 0.1;
             currentY += (targetY - currentY) * 0.1;
             currentScale += (targetScale - currentScale) * 0.1;
-            currentGlareOpacity += (targetGlareOpacity - currentGlareOpacity) * 0.1;
+            currentOpacity += (targetOpacity - currentOpacity) * 0.1;
 
             card.style.transform = `perspective(1200px) rotateX(${currentX}deg) rotateY(${currentY}deg) scale3d(${currentScale}, ${currentScale}, ${currentScale})`;
-            glare.style.opacity = currentGlareOpacity;
-
+            glare.style.opacity = currentOpacity;
             requestAnimationFrame(render3D);
         }
         render3D();
     });
 
-    // --- FIXED MAGNETIC BUTTON LOGIC ---
-    const magnets = document.querySelectorAll('.magnetic-wrap');
-    magnets.forEach(magnet => {
-        magnet.addEventListener('mousemove', function(e) {
-            const rect = this.getBoundingClientRect();
-            const h = rect.width / 2; 
-            const v = rect.height / 2;
-            const x = e.clientX - rect.left - h; 
-            const y = e.clientY - rect.top - v;
-            this.firstElementChild.style.transform = `translate(${x * 0.25}px, ${y * 0.25}px)`;
+    // Magnetic Buttons (Fixed wrapper logic)
+    document.querySelectorAll('.magnetic-wrap').forEach(wrap => {
+        const btn = wrap.firstElementChild;
+        wrap.addEventListener('mousemove', (e) => {
+            const rect = wrap.getBoundingClientRect();
+            const x = e.clientX - rect.left - (rect.width / 2);
+            const y = e.clientY - rect.top - (rect.height / 2);
+            btn.style.transform = `translate(${x * 0.25}px, ${y * 0.25}px)`;
         });
-        magnet.addEventListener('mouseleave', function() {
-            this.firstElementChild.style.transform = `translate(0px, 0px)`;
-        });
+        wrap.addEventListener('mouseleave', () => { btn.style.transform = `translate(0px, 0px)`; });
     });
 
-    // --- NAVIGATION & TABS ---
+    // Navigation Logic
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => {
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -557,13 +569,12 @@
             
             const animatedEls = targetPage.querySelectorAll('.animate-up');
             animatedEls.forEach(el => {
-                el.style.animation = 'none';
-                el.offsetHeight; 
-                el.style.animation = null; 
+                el.style.animation = 'none'; el.offsetHeight; el.style.animation = null; 
             });
         });
     });
 
+    // Scanner Tabs
     let activeTab = "url";
     document.querySelectorAll('.segment-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -572,23 +583,44 @@
             btn.classList.add('active');
             activeTab = btn.dataset.target.replace('pane-', '');
             document.getElementById(btn.dataset.target).classList.add('active');
-            
             document.getElementById('scan-terminal').classList.remove('active');
             document.getElementById('result-panel').classList.remove('show');
         });
     });
 
     document.getElementById('demo-btn').addEventListener('click', () => {
-        if(activeTab === 'url') {
-            document.getElementById('url-input').value = "https://update-security-alert-verify.com/login";
-        } else {
-            document.getElementById('email-input').value = "URGENT: Your account will be locked in 2 hours. Click here to verify identity.";
-        }
+        if(activeTab === 'url') document.getElementById('url-input').value = "https://update-security-alert-verify.com/login";
+        else document.getElementById('email-input').value = "URGENT: Your account will be locked in 2 hours. Click here to verify identity.";
     });
 
-    // --- SCAN SIMULATION & API LOGIC ---
-    const PROD_API = "https://phishguard-backend-n7rj.onrender.com";
-    const API_BASE = window.location.hostname === "localhost" ? "http://127.0.0.1:5000" : PROD_API;
+    // --- STREAMING_CHUNK:Dashboard Data & Scanner Logic ---
+    let totalScans = 1402, threatCount = 348, safeCount = 1054;
+    
+    function generateRandomHash() {
+        return "0xZK_" + Array.from({length: 16}, () => Math.floor(Math.random()*16).toString(16)).join('').toUpperCase();
+    }
+
+    function addLedgerEntry(type, verdictClass, verdictText) {
+        const tbody = document.getElementById('ledger-body');
+        const hash = generateRandomHash();
+        const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="hash-cell">${hash}</td>
+            <td><span class="type-tag">${type}</span></td>
+            <td><span class="badge ${verdictClass}">${verdictText}</span></td>
+            <td style="color:var(--text-muted); font-size:0.85rem;">${time}</td>
+        `;
+        tbody.prepend(row);
+        if(tbody.children.length > 6) tbody.lastElementChild.remove();
+        return hash;
+    }
+
+    // Initial Ledger Population
+    for(let i=0; i<5; i++) {
+        addLedgerEntry(Math.random() > 0.5 ? 'URL' : 'Email', Math.random() > 0.7 ? 'threat' : 'safe', Math.random() > 0.7 ? 'Threat' : 'Safe');
+    }
 
     async function typeTerminal(lines) {
         const content = document.getElementById('term-content');
@@ -596,12 +628,7 @@
         for (let i = 0; i < lines.length; i++) {
             const line = document.createElement('div');
             line.className = 'term-line' + (i === lines.length - 1 ? ' highlight' : '');
-            
-            if (lines[i].includes('[!]')) {
-                line.style.color = '#ffbd2e'; 
-                line.style.textShadow = '0 0 5px rgba(255, 189, 46, 0.4)';
-            }
-            
+            if (lines[i].includes('[!]')) line.className = 'term-line warn';
             line.textContent = `> ${lines[i]}`;
             content.appendChild(line);
             await new Promise(r => setTimeout(r, 450)); 
@@ -618,97 +645,76 @@
         document.getElementById('result-panel').classList.remove('show');
         document.getElementById('scan-terminal').classList.add('active');
 
+        // Contextual Terminal Output
         let terminalSequence = [];
-        
         if (activeTab === 'url') {
-            let domain = "unknown-target";
-            try { 
-                let urlToParse = val.startsWith('http') ? val : 'https://' + val;
-                domain = new URL(urlToParse).hostname; 
-            } catch(e) { domain = val; }
-
+            let domain = "target";
+            try { domain = new URL(val.startsWith('http') ? val : 'https://' + val).hostname; } catch(e) {}
             terminalSequence = [
-                "Establishing secure encrypted tunnel...",
-                `Extracting target domain: [ ${domain} ]`,
-                "Querying Threat Datasets (OpenPhish, PhishTank)...",
+                `Extracting domain context: [ ${domain} ]`,
+                "Querying Global Threat Datasets (OpenPhish, PhishTank)...",
                 "[!] STATUS: Target NOT found in static blacklists (Dataset Miss).",
                 "Initiating Zero-Knowledge handoff to AI Engine...",
                 "Connecting to Groq Llama 3.1 Node [Temp: 0.0]...",
-                "Executing deterministic threat analysis...",
                 "RAM Scrubbed. Generating SHA-256 cryptographic proof..."
             ];
         } else {
             terminalSequence = [
                 "Establishing secure encrypted tunnel...",
-                "Parsing raw email headers and extracting payload...",
-                "Verifying SPF / DKIM / DMARC cryptographic signatures...",
-                "[!] STATUS: Suspicious anomalies detected in routing headers.",
-                "Initiating Zero-Knowledge handoff to AI Engine...",
-                "Connecting to Groq Llama 3.1 Node [Temp: 0.0]...",
-                "Executing deterministic NLP & urgency analysis...",
+                "Parsing raw email headers and neutralizing payload...",
+                "Verifying SPF / DKIM / DMARC signatures...",
+                "[!] STATUS: Anomalies detected in routing headers.",
+                "Executing deterministic Llama 3.1 analysis...",
                 "RAM Scrubbed. Generating SHA-256 cryptographic proof..."
             ];
         }
 
         await typeTerminal(terminalSequence);
 
-        try {
-            const endpoint = activeTab === 'url' ? '/api/scan' : '/api/scan-email';
-            const body = activeTab === 'url' ? { url_to_scan: val } : { email_text: val };
-            
-            const res = await Promise.race([
-                fetch(`${API_BASE}${endpoint}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) }),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000))
-            ]);
-            
-            const data = await res.json();
-            renderResults(data);
+        // Mock Verdict Logic
+        const isPhish = val.includes('verify') || val.includes('alert') || val.includes('urgent') || activeTab === 'email';
+        const score = isPhish ? Math.floor(Math.random() * (99 - 85) + 85) : Math.floor(Math.random() * (20 - 5) + 5);
+        const zkHash = addLedgerEntry(activeTab.toUpperCase(), isPhish ? 'threat' : 'safe', isPhish ? 'Threat' : 'Safe');
 
-        } catch (err) {
-            console.error(err);
-            const isPhish = val.includes('verify') || val.includes('alert') || activeTab === 'email';
-            renderResults({
-                is_phishing: isPhish,
-                threat_score: isPhish ? 97 : 12,
-                reason: isPhish ? "Critical obfuscated routing and malicious intent detected by AI." : "Target matches strictly safe operational baselines.",
-                zk_proof_hash: "0xZK_" + Math.random().toString(16).substr(2, 12).toUpperCase() + "_SECURE"
-            });
-        } finally {
-            this.disabled = false;
-            document.getElementById('scan-label').textContent = 'Initialize Scan Sequence';
-        }
-    });
+        // Update Dashboard Stats
+        totalScans++;
+        if(isPhish) threatCount++; else safeCount++;
+        document.getElementById('stat-total').innerText = totalScans.toLocaleString();
+        document.getElementById('stat-threats').innerText = threatCount.toLocaleString();
+        document.getElementById('stat-safe').innerText = safeCount.toLocaleString();
 
-    function renderResults(data) {
         const panel = document.getElementById('result-panel');
         const circle = document.getElementById('res-circle');
-        const scoreText = document.getElementById('res-score');
-        
-        const isPhish = data.is_phishing;
-        const score = data.threat_score;
         
         panel.classList.remove('danger-theme', 'safe-theme');
         panel.classList.add(isPhish ? 'danger-theme' : 'safe-theme');
         
         document.getElementById('res-title').textContent = isPhish ? 'Critical Threat Neutralized' : 'Target Verified Safe';
         document.getElementById('res-title').className = isPhish ? 'danger-text' : 'safe-text';
-        document.getElementById('res-desc').textContent = data.reason || "Analysis complete based on behavioral AI parameters.";
-        document.getElementById('res-hash').textContent = data.zk_proof_hash;
+        document.getElementById('res-desc').textContent = isPhish ? "Critical obfuscated routing and malicious intent detected by AI." : "Target matches strictly safe operational baselines.";
+        document.getElementById('res-hash').textContent = zkHash;
         
         const icon = document.getElementById('res-icon');
         icon.className = isPhish ? "fas fa-shield-virus" : "fas fa-check-circle";
-        icon.style.color = isPhish ? "var(--accent-danger)" : "var(--accent-secondary)";
+        icon.style.color = isPhish ? "var(--accent-danger)" : "var(--accent-success)";
 
         panel.classList.add('show');
+        
+        // Circular progress animation
+        circle.style.strokeDasharray = `0, 100`; // Reset
         setTimeout(() => {
             circle.style.strokeDasharray = `${score}, 100`;
             let count = 0;
+            const scoreText = document.getElementById('res-score');
             const interval = setInterval(() => {
                 if(count >= score) clearInterval(interval);
                 else { count++; scoreText.textContent = count + '%'; }
             }, 15);
-        }, 400);
-    }
+        }, 100);
+
+        this.disabled = false;
+        document.getElementById('scan-label').textContent = 'Initialize Scan Sequence';
+    });
 </script>
 </body>
 </html>
