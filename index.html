@@ -6,8 +6,8 @@
     <meta name="description" content="PhishGuard ZK v2 — Enterprise AI Phishing Detector">
     <title>PhishGuard ZK | Zero-Trust AI Engine</title>
     
-    <!-- Premium Integrated SVG Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 10 L15 25 V50 C15 70 30 85 50 95 C70 85 85 70 85 50 V25 Z' fill='none' stroke='%2322d3ee' stroke-width='8' stroke-linejoin='round'/><circle cx='50' cy='55' r='15' fill='%23a78bfa'/></svg>">
+    <!-- Premium Integrated Favicon -->
+    <link rel="icon" type="image/png" href="logo.png" onerror="this.href='https://cdn-icons-png.flaticon.com/512/2040/2040504.png'">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,24 +16,32 @@
     
     <style>
         :root {
-            --bg-base: #010103;
-            --glass-bg: rgba(15, 15, 20, 0.35);
-            --glass-border: rgba(255, 255, 255, 0.06);
+            --bg-base: #030305;
+            --glass-bg: rgba(12, 12, 16, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
             
             --accent-primary: #a78bfa; 
             --accent-secondary: #22d3ee; 
             --accent-danger: #f43f5e;
             --accent-success: #34d399;
             
-            --text-main: #ffffff;
+            --text-main: #f8fafc;
             --text-muted: #94a3b8;
             
-            --transition-smooth: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-smooth: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
-        
-        @media (max-width: 768px) { * { cursor: auto !important; } }
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            cursor: none !important; /* Force hide default cursor for custom one */
+        }
+
+        /* Re-enable default cursor on touch devices */
+        @media (hover: none) and (pointer: coarse) {
+            * { cursor: auto !important; }
+            .cursor-dot, .cursor-outline { display: none !important; }
+        }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -42,302 +50,419 @@
             min-height: 100vh;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* --- STREAMING_CHUNK:Cursor and Animated Backgrounds --- */
+        /* --- STREAMING_CHUNK:Cursor --- */
         .cursor-dot, .cursor-outline {
-            position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
-            border-radius: 50%; z-index: 9999; pointer-events: none;
-            mix-blend-mode: difference; 
+            position: fixed; top: 0; left: 0;
+            border-radius: 50%; z-index: 99999; pointer-events: none;
+            /* Use hardware acceleration */
+            will-change: transform;
         }
-        .cursor-dot { width: 8px; height: 8px; background-color: white; }
+        .cursor-dot { 
+            width: 6px; height: 6px; background-color: var(--accent-secondary); 
+            box-shadow: 0 0 10px var(--accent-secondary);
+            /* Centering compensation done in JS */
+        }
         .cursor-outline {
-            width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.5);
-            transition: width 0.3s ease, height 0.3s ease;
+            width: 40px; height: 40px; 
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
         }
-        .cursor-hover .cursor-outline { width: 70px; height: 70px; background: rgba(255,255,255,1); border-color: transparent; }
+        .cursor-hover { 
+            width: 65px; height: 65px; 
+            background-color: rgba(255, 255, 255, 0.05); 
+            border-color: rgba(34, 211, 238, 0.5); 
+            backdrop-filter: blur(2px);
+        }
 
+        #network-canvas {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; pointer-events: none; opacity: 0.5;
+        }
+        
+        /* --- STREAMING_CHUNK:Background Effects --- */
         .noise-bg {
-            position: fixed; inset: 0; z-index: -2; opacity: 0.04; pointer-events: none;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            position: fixed; inset: 0; z-index: -2; opacity: 0.05; pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
         
         .aurora-bg {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -3;
-            background: radial-gradient(circle at 10% 40%, rgba(167, 139, 250, 0.12), transparent 30%),
-                        radial-gradient(circle at 90% 60%, rgba(34, 211, 238, 0.08), transparent 30%),
-                        radial-gradient(circle at 50% 100%, rgba(244, 63, 94, 0.05), transparent 40%);
-            filter: blur(80px); animation: aurora Drift 20s ease-in-out infinite alternate;
+            background: 
+                radial-gradient(circle at 15% 30%, rgba(167, 139, 250, 0.12), transparent 40%),
+                radial-gradient(circle at 85% 70%, rgba(34, 211, 238, 0.08), transparent 40%),
+                radial-gradient(circle at 50% 100%, rgba(244, 63, 94, 0.05), transparent 50%);
+            filter: blur(60px); 
+            animation: auroraDrift 25s ease-in-out infinite alternate;
         }
-        @keyframes aurora Drift {
+        @keyframes auroraDrift {
             0% { transform: scale(1) translate(0, 0); }
-            50% { transform: scale(1.1) translate(40px, -20px); }
-            100% { transform: scale(1.05) translate(-20px, 30px); }
-        }
-        .grid-overlay {
-            position: fixed; inset: 0; z-index: -2; opacity: 0.2; pointer-events: none;
-            background-image: linear-gradient(var(--glass-border) 1px, transparent 1px),
-                              linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
-            background-size: 50px 50px;
-            mask-image: radial-gradient(ellipse at top, black 20%, transparent 80%);
-            -webkit-mask-image: radial-gradient(ellipse at top, black 20%, transparent 80%);
+            50% { transform: scale(1.1) translate(30px, -20px); }
+            100% { transform: scale(1.05) translate(-30px, 20px); }
         }
 
-        /* --- STREAMING_CHUNK:Navbar and Container Layout --- */
+        .reveal-card {
+            position: relative;
+        }
+        .reveal-card::before {
+            content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
+            background: radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(34, 211, 238, 0.6), transparent 40%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude; 
+            pointer-events: none; opacity: 0; transition: opacity 0.4s ease; z-index: 10;
+        }
+        .reveal-card::after {
+            content: ""; position: absolute; inset: 0; border-radius: inherit;
+            background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(34, 211, 238, 0.04), transparent 40%);
+            pointer-events: none; opacity: 0; transition: opacity 0.4s ease; z-index: -1;
+        }
+        @media (hover: hover) {
+            .reveal-card:hover::before, .reveal-card:hover::after { opacity: 1; }
+        }
+
+        /* --- STREAMING_CHUNK:Telemetry Toast --- */
+        #telemetry-container {
+            position: fixed; bottom: 20px; left: 20px; z-index: 999;
+            display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+        }
+        .telemetry-toast {
+            background: rgba(10, 10, 15, 0.85); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-left: 3px solid var(--accent-secondary);
+            padding: 12px 16px; border-radius: 8px; color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+            animation: slideInToast 0.5s cubic-bezier(0.16, 1, 0.3, 1), fadeOutToast 0.5s 4s forwards;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .telemetry-toast.danger { border-left-color: var(--accent-danger); }
+        .telemetry-toast i { font-size: 1.1rem; }
+        @keyframes slideInToast { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOutToast { to { opacity: 0; transform: translateY(10px); filter: blur(5px); } }
+
+        /* --- STREAMING_CHUNK:Navbar and Layout --- */
         .navbar {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 1.5rem 4rem; position: sticky; top: 0; z-index: 100;
-            background: rgba(1, 1, 3, 0.4); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            padding: 1.5rem 5%; position: sticky; top: 0; z-index: 100;
+            background: rgba(3, 3, 5, 0.5); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--glass-border);
         }
-        @media (max-width: 768px) { .navbar { padding: 1.2rem 1.5rem; flex-direction: column; gap: 1rem; } }
+        @media (max-width: 768px) { .navbar { padding: 1.2rem; flex-direction: column; gap: 1rem; } }
         
-        .logo { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.5rem; display: flex; align-items: center; gap: 0.5rem; letter-spacing: -0.5px; }
-        .logo i { color: var(--accent-secondary); text-shadow: 0 0 15px rgba(34, 211, 238, 0.6); }
-        .v2-badge { font-size: 0.65rem; padding: 0.15rem 0.5rem; border:1px solid rgba(167, 139, 250, 0.4); border-radius:12px; color:var(--accent-primary); background: rgba(167, 139, 250, 0.1); font-family: 'Inter', sans-serif; letter-spacing: 1px;}
-        
-        .nav-links { display: flex; gap: 2.5rem; }
-        .nav-item { 
-            color: var(--text-muted); font-size: 0.9rem; font-weight: 500; text-transform: uppercase; 
-            letter-spacing: 1.5px; transition: var(--transition-smooth); position: relative; padding: 0.5rem 0;
+        .logo { 
+            font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.6rem; 
+            display: flex; align-items: center; gap: 0.8rem; letter-spacing: -0.5px; 
         }
-        .nav-item.active { color: var(--text-main); text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+        /* Increased logo size and removed shadow as Sruthika's design has it naturally */
+        .logo img { height: 2.8rem; width: auto; object-fit: contain; transform: scale(1.1); transition: transform 0.3s ease; }
+        .logo:hover img { transform: scale(1.15); }
+        
+        .v2-badge { 
+            font-size: 0.65rem; padding: 0.2rem 0.6rem; border:1px solid rgba(167, 139, 250, 0.5); 
+            border-radius: 12px; color:#fff; background: rgba(167, 139, 250, 0.2); 
+            font-family: 'JetBrains Mono', monospace; letter-spacing: 1px; box-shadow: 0 0 10px rgba(167, 139, 250, 0.3);
+        }
+        
+        .nav-links { display: flex; gap: 3rem; }
+        .nav-item { 
+            color: var(--text-muted); font-size: 0.95rem; font-weight: 500; text-transform: uppercase; 
+            letter-spacing: 2px; transition: var(--transition-smooth); position: relative; padding: 0.5rem 0;
+        }
+        .nav-item.active { color: var(--text-main); text-shadow: 0 0 15px rgba(255,255,255,0.4); }
         .nav-item::after {
-            content: ''; position: absolute; bottom: 0; left: 0; width: 0%; height: 2px;
+            content: ''; position: absolute; bottom: -2px; left: 0; width: 0%; height: 2px;
             background: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary)); 
             transition: var(--transition-smooth); box-shadow: 0 0 10px var(--accent-secondary);
         }
         .nav-item.active::after, .nav-item:hover::after { width: 100%; }
 
-        .system-status { display: flex; align-items: center; gap: 0.6rem; font-size: 0.8rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; background: rgba(255,255,255,0.03); padding: 0.4rem 1rem; border-radius: 20px; border: 1px solid var(--glass-border); }
-        .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-secondary); box-shadow: 0 0 12px var(--accent-secondary); animation: pulseStatus 2s infinite; }
-        @keyframes pulseStatus { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.3); } 100% { opacity: 1; transform: scale(1); } }
+        .system-status { 
+            display: flex; align-items: center; gap: 0.8rem; font-size: 0.85rem; color: var(--text-muted); 
+            font-family: 'JetBrains Mono', monospace; background: rgba(255,255,255,0.02); 
+            padding: 0.5rem 1.2rem; border-radius: 30px; border: 1px solid var(--glass-border); 
+        }
+        .pulse-dot { 
+            width: 8px; height: 8px; border-radius: 50%; background: var(--accent-success); 
+            box-shadow: 0 0 12px var(--accent-success); animation: pulseStatus 2s infinite; 
+        }
+        @keyframes pulseStatus { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.4); } }
 
-        .container { max-width: 1100px; margin: 0 auto; padding: 5rem 2rem; position: relative; z-index: 10; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 6rem 2rem; position: relative; z-index: 10; }
         .page { display: none; }
         .page.active { display: block; }
         
-        .animate-up { opacity: 0; transform: translateY(30px); animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-up { opacity: 0; transform: translateY(40px); animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .delay-1 { animation-delay: 0.1s; } .delay-2 { animation-delay: 0.2s; } .delay-3 { animation-delay: 0.3s; }
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); filter: blur(5px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
 
-        /* --- STREAMING_CHUNK:Hero and 3D Glass Panels --- */
+        /* --- STREAMING_CHUNK:Hero and Glitch Text --- */
+        .glitch-text { position: relative; display: inline-block; }
+        .glitch-text::before, .glitch-text::after {
+            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: transparent; opacity: 0; pointer-events: none;
+        }
+        .glitch-text:hover::before {
+            left: 2px; text-shadow: -2px 0 var(--accent-danger); clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse; opacity: 1; z-index: 2;
+        }
+        .glitch-text:hover::after {
+            left: -2px; text-shadow: -2px 0 var(--accent-secondary); clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2.5s infinite linear alternate-reverse; opacity: 1; z-index: 2;
+        }
+        @keyframes glitch-anim { 0% { clip: rect(10px, 9999px, 86px, 0); } 100% { clip: rect(20px, 9999px, 85px, 0); } }
+        @keyframes glitch-anim-2 { 0% { clip: rect(65px, 9999px, 10px, 0); } 100% { clip: rect(80px, 9999px, 50px, 0); } }
+
         .hero { text-align: center; margin-bottom: 5rem; position: relative; z-index: 10; }
-        .hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(3.5rem, 6vw, 5.5rem); font-weight: 700; line-height: 1.05; margin-bottom: 1.5rem; letter-spacing: -2px; }
+        .hero h1 { 
+            font-family: 'Space Grotesk', sans-serif; font-size: clamp(3rem, 6vw, 6rem); 
+            font-weight: 700; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -2.5px; 
+        }
         
         .text-gradient { 
-            background: linear-gradient(to right, #ffffff, #a78bfa 40%, #22d3ee 80%, #ffffff); 
-            background-size: 200% auto;
-            -webkit-background-clip: text; background-clip: text; color: transparent; 
-            animation: shine 6s linear infinite;
+            background: linear-gradient(to right, #ffffff, #e2e8f0, #a78bfa 40%, #22d3ee 80%, #ffffff); 
+            background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent; 
+            animation: shine 8s linear infinite reverse;
         }
         @keyframes shine { to { background-position: 200% center; } }
-        .hero p { color: var(--text-muted); font-size: 1.15rem; max-width: 650px; margin: 0 auto; line-height: 1.7; font-weight: 300; }
+        .hero p { color: var(--text-muted); font-size: 1.2rem; max-width: 700px; margin: 0 auto; line-height: 1.8; font-weight: 400; }
 
-        .tilt-wrapper { perspective: 1500px; transform-style: preserve-3d; }
+        /* --- STREAMING_CHUNK:Engine UI Elements --- */
+        .tilt-wrapper { perspective: 2000px; transform-style: preserve-3d; margin: 0 auto; max-width: 800px;}
         .glass-panel {
             background: var(--glass-bg); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            border: 1px solid var(--glass-border); border-radius: 30px; padding: 3rem;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
-            position: relative; overflow: hidden; transform-style: preserve-3d;
-            will-change: transform;
+            border: 1px solid var(--glass-border); border-radius: 32px; padding: 3.5rem;
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8), inset 0 1px 0 var(--glass-highlight);
+            transform-style: preserve-3d; will-change: transform;
         }
         
-        .glare {
-            position: absolute; width: 400px; height: 400px;
-            background: radial-gradient(circle closest-side, rgba(255,255,255,0.15), transparent);
-            border-radius: 50%; pointer-events: none; opacity: 0;
-            transform: translate(-50%, -50%); transition: opacity 0.3s ease;
-            z-index: 10; top: 0; left: 0; mix-blend-mode: overlay;
-        }
-
-        /* --- STREAMING_CHUNK:Engine Form and Buttons --- */
         .segmented-control { 
-            display: flex; background: rgba(0,0,0,0.6); border-radius: 16px; padding: 0.5rem; 
-            margin-bottom: 2.5rem; border: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 20;
+            display: flex; background: rgba(0,0,0,0.4); border-radius: 18px; padding: 0.4rem; 
+            margin-bottom: 3rem; border: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 20;
+            box-shadow: inset 0 4px 20px rgba(0,0,0,0.5);
         }
-        .segment-btn { flex: 1; padding: 1rem; text-align: center; font-weight: 500; font-size: 1rem; color: var(--text-muted); border-radius: 12px; transition: var(--transition-smooth); position: relative; overflow: hidden; }
-        .segment-btn.active { color: var(--text-main); }
-        .segment-btn.active::before {
-            content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.1); 
-            border-radius: 12px; z-index: -1; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
+        .segment-btn { 
+            flex: 1; padding: 1.2rem; text-align: center; font-weight: 600; font-size: 1.05rem; 
+            color: var(--text-muted); border-radius: 14px; transition: var(--transition-smooth); 
+            position: relative; z-index: 2;
+        }
+        .segment-btn.active { color: var(--text-main); text-shadow: 0 0 10px rgba(255,255,255,0.3);}
+        .segment-pill {
+            position: absolute; top: 0.4rem; bottom: 0.4rem; left: 0.4rem; width: calc(50% - 0.4rem);
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px; z-index: 1; transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
-        .input-wrapper { position: relative; margin-bottom: 2rem; display: none; z-index: 20; }
-        .input-wrapper.active { display: block; animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .input-wrapper { position: relative; margin-bottom: 2.5rem; display: none; z-index: 20; }
+        .input-wrapper.active { display: block; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
 
         .premium-input {
-            width: 100%; padding: 1.5rem 1.5rem 1.5rem 3.5rem; background: rgba(0,0,0,0.4); 
+            width: 100%; padding: 1.6rem 1.6rem 1.6rem 4rem; background: rgba(0,0,0,0.5); 
             border: 1px solid var(--glass-border); border-radius: 20px; color: var(--text-main); 
-            font-size: 1.05rem; font-family: 'JetBrains Mono', monospace;
-            transition: var(--transition-smooth); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+            font-size: 1.1rem; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.5px;
+            transition: var(--transition-smooth); box-shadow: inset 0 4px 15px rgba(0,0,0,0.6);
         }
-        .input-icon { position: absolute; top: 1.6rem; left: 1.5rem; color: var(--text-muted); font-size: 1.2rem; transition: 0.3s; }
+        .input-icon { position: absolute; top: 1.7rem; left: 1.6rem; color: var(--text-muted); font-size: 1.3rem; transition: 0.4s; }
         .premium-input:focus { 
-            outline: none; border-color: var(--accent-primary); background: rgba(0,0,0,0.7);
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 20px rgba(167, 139, 250, 0.2); 
+            outline: none; border-color: var(--accent-secondary); background: rgba(0,0,0,0.8);
+            box-shadow: inset 0 4px 20px rgba(0,0,0,0.8), 0 0 25px rgba(34, 211, 238, 0.15); 
         }
-        .premium-input:focus + .input-icon, .premium-input:focus ~ .input-icon { color: var(--accent-primary); }
-        textarea.premium-input { min-height: 160px; padding-left: 1.5rem; resize: vertical; }
+        .premium-input:focus + .input-icon, .premium-input:focus ~ .input-icon { color: var(--accent-secondary); text-shadow: 0 0 10px var(--accent-secondary);}
+        textarea.premium-input { min-height: 180px; padding-left: 1.6rem; resize: vertical; line-height: 1.6;}
 
         .btn-group { display: flex; gap: 1.5rem; align-items: stretch; position: relative; z-index: 20; }
         .magnetic-wrap { position: relative; display: inline-block; }
         .wrap-primary { flex: 1; }
         
         .btn-primary {
-            width: 100%; height: 100%; padding: 1.3rem 2rem; background: #ffffff; color: #000;
-            border: none; border-radius: 18px; font-weight: 700; font-size: 1.1rem; font-family: 'Space Grotesk', sans-serif;
-            display: flex; align-items: center; justify-content: center; gap: 0.75rem;
-            will-change: transform; transition: transform 0.2s ease, box-shadow 0.3s;
-            position: relative; overflow: hidden;
+            width: 100%; height: 100%; padding: 1.4rem 2rem; 
+            background: linear-gradient(135deg, #ffffff, #e2e8f0); color: #000;
+            border: none; border-radius: 18px; font-weight: 700; font-size: 1.15rem; font-family: 'Space Grotesk', sans-serif;
+            display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+            will-change: transform; transition: transform 0.2s ease, box-shadow 0.4s;
+            position: relative; overflow: hidden; letter-spacing: -0.5px;
         }
-        .btn-primary:hover { box-shadow: 0 0 30px rgba(255,255,255,0.4); }
-        .btn-primary:disabled { background: #333; color: #888; pointer-events: none; }
+        .btn-primary:hover { box-shadow: 0 10px 40px rgba(255,255,255,0.25); transform: translateY(-2px); }
+        .btn-primary:disabled { background: #1a1a24; color: #475569; pointer-events: none; border: 1px solid var(--glass-border);}
 
         .btn-secondary { 
-            width: 100%; height: 100%; min-width: 70px; padding: 1.3rem; 
-            background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); 
-            border-radius: 18px; color: var(--text-main); font-size: 1.3rem;
+            width: 100%; height: 100%; min-width: 75px; padding: 1.4rem; 
+            background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); 
+            border-radius: 18px; color: var(--text-main); font-size: 1.4rem;
             display: flex; align-items: center; justify-content: center;
-            will-change: transform; transition: transform 0.2s ease, background 0.3s, border-color 0.3s; 
+            will-change: transform; transition: all 0.4s ease; 
         }
-        .btn-secondary:hover { border-color: var(--accent-secondary); background: rgba(34, 211, 238, 0.1); color: var(--accent-secondary); }
+        .btn-secondary:hover { 
+            border-color: var(--accent-secondary); background: rgba(34, 211, 238, 0.08); 
+            color: var(--accent-secondary); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(34, 211, 238, 0.15);
+        }
 
-        /* --- STREAMING_CHUNK:Dashboard (Ledger) Styles --- */
-        .dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2.5rem; }
+        /* --- STREAMING_CHUNK:Terminal and Ledger Styles --- */
+        .terminal-box { 
+            display: none; margin-top: 3rem; background: #050508; border: 1px solid var(--glass-border); 
+            border-radius: 20px; overflow: hidden; box-shadow: inset 0 0 30px rgba(0,0,0,0.9), 0 20px 40px rgba(0,0,0,0.5); 
+            position: relative; z-index: 20;
+        }
+        .terminal-box.active { display: block; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .term-header { background: rgba(255,255,255,0.03); padding: 1rem 1.5rem; display: flex; gap: 0.6rem; border-bottom: 1px solid var(--glass-border); }
+        .term-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .term-dot:nth-child(1) { background: #ff5f56; box-shadow: 0 0 10px rgba(255,95,86,0.6); } 
+        .term-dot:nth-child(2) { background: #ffbd2e; box-shadow: 0 0 10px rgba(255,189,46,0.6);} 
+        .term-dot:nth-child(3) { background: #27c93f; box-shadow: 0 0 10px rgba(39,201,63,0.6);}
+        
+        .term-body { 
+            padding: 2.5rem; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; 
+            color: #4ade80; line-height: 1.9; text-shadow: 0 0 8px rgba(74, 222, 128, 0.4); 
+            position: relative; min-height: 250px;
+        }
+        .term-body::before {
+            content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(0,0,0,0.25) 50%); 
+            background-size: 100% 4px; pointer-events: none; z-index: 2;
+        }
+        .term-line { opacity: 0; animation: typeLine 0.1s forwards; position: relative; z-index: 3;}
+        @keyframes typeLine { to { opacity: 1; } }
+        .term-line.highlight { color: var(--accent-secondary); text-shadow: 0 0 12px var(--accent-secondary); }
+        .term-line.warn { color: #ffbd2e; text-shadow: 0 0 12px rgba(255, 189, 46, 0.8); }
+        .blinking-cursor::after { content: ' _'; animation: blink 1s step-end infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .result-container { 
+            display: none; margin-top: 3rem; border-radius: 24px; overflow: hidden; 
+            border: 1px solid var(--glass-border); background: rgba(0,0,0,0.6); 
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); position: relative; z-index: 20; 
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 var(--glass-highlight);
+        }
+        .result-container.show { display: block; }
+        .result-grid { display: grid; grid-template-columns: 1fr auto; gap: 4rem; padding: 3.5rem; align-items: center; }
+        @media (max-width: 768px) { .result-grid { grid-template-columns: 1fr; text-align: center; gap: 2.5rem; padding: 2.5rem; } }
+        
+        .result-info h3 { font-family: 'Space Grotesk', sans-serif; font-size: 2.5rem; margin-bottom: 1rem; letter-spacing: -1.5px; }
+        .danger-text { color: var(--accent-danger); text-shadow: 0 0 25px rgba(244,63,94,0.5); } 
+        .safe-text { color: var(--accent-success); text-shadow: 0 0 25px rgba(52,211,153,0.5); }
+        .result-desc { color: var(--text-muted); line-height: 1.8; font-size: 1.1rem; margin-bottom: 2.5rem; }
+
+        .circular-chart { width: 160px; height: 160px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.1)); }
+        .circle-bg { fill: none; stroke: rgba(255,255,255,0.04); stroke-width: 2.5; }
+        .circle { fill: none; stroke-width: 2.5; stroke-linecap: round; transition: stroke-dasharray 2s cubic-bezier(0.16, 1, 0.3, 1); stroke-dasharray: 0, 100;}
+        .danger-theme .circle { stroke: var(--accent-danger); filter: drop-shadow(0 0 15px rgba(244,63,94,0.7)); }
+        .safe-theme .circle { stroke: var(--accent-success); filter: drop-shadow(0 0 15px rgba(52,211,153,0.7)); }
+        .percentage { fill: var(--text-main); font-family: 'Space Grotesk', sans-serif; font-size: 0.6em; text-anchor: middle; font-weight: 700; }
+
+        .zk-proof-box { 
+            background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.15); 
+            padding: 1.5rem; border-radius: 18px; display: flex; align-items: center; 
+            justify-content: space-between; gap: 1rem; margin-top: 1.5rem; transition: var(--transition-smooth); 
+        }
+        .zk-proof-box:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.3); }
+        .zk-hash { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent-primary); word-break: break-all; }
+
+        .dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-bottom: 3.5rem; }
         @media (max-width: 768px) { .dash-grid { grid-template-columns: 1fr; } }
         
         .stat-card {
-            background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 2rem; display: flex; flex-direction: column; gap: 0.5rem;
-            transition: var(--transition-smooth);
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 24px; padding: 2.5rem; display: flex; flex-direction: column; gap: 0.8rem;
+            transition: var(--transition-smooth); backdrop-filter: blur(20px);
+            box-shadow: inset 0 1px 0 var(--glass-highlight), 0 20px 40px rgba(0,0,0,0.4);
         }
-        .stat-card:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
-        .stat-title { color: var(--text-muted); font-size: 0.9rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 3rem; font-weight: 700; color: var(--text-main); }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-title { color: var(--text-muted); font-size: 0.95rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; }
+        .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 3.5rem; font-weight: 700; color: var(--text-main); line-height: 1;}
         
-        .stat-value.cyan { color: var(--accent-secondary); text-shadow: 0 0 20px rgba(34,211,238,0.3); }
-        .stat-value.red { color: var(--accent-danger); text-shadow: 0 0 20px rgba(244,63,94,0.3); }
-        .stat-value.green { color: var(--accent-success); text-shadow: 0 0 20px rgba(52,211,153,0.3); }
+        .stat-value.cyan { color: var(--accent-secondary); text-shadow: 0 0 25px rgba(34,211,238,0.4); }
+        .stat-value.red { color: var(--accent-danger); text-shadow: 0 0 25px rgba(244,63,94,0.4); }
+        .stat-value.green { color: var(--accent-success); text-shadow: 0 0 25px rgba(52,211,153,0.4); }
 
         .ledger-container {
-            background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 2rem; overflow: hidden;
+            background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border);
+            border-radius: 24px; padding: 2.5rem; overflow: hidden; backdrop-filter: blur(20px);
+            box-shadow: inset 0 1px 0 var(--glass-highlight), 0 30px 60px rgba(0,0,0,0.5);
         }
-        .ledger-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        .ledger-header h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; }
-        .pulse-live { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--accent-success); }
+        .ledger-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .ledger-header h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; letter-spacing: -0.5px;}
+        .pulse-live { display: flex; align-items: center; gap: 0.6rem; font-size: 0.85rem; color: var(--accent-success); font-weight: 500;}
         
         .table-wrap { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { padding: 1rem; color: var(--text-muted); font-weight: 500; font-size: 0.85rem; border-bottom: 1px solid var(--glass-border); text-transform: uppercase; letter-spacing: 1px;}
-        td { padding: 1rem; font-size: 0.95rem; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        th { padding: 1.2rem; color: var(--text-muted); font-weight: 600; font-size: 0.85rem; border-bottom: 1px solid var(--glass-border); text-transform: uppercase; letter-spacing: 1.5px;}
+        td { padding: 1.2rem; font-size: 0.95rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
         tr { transition: background 0.3s; }
-        tr:hover { background: rgba(255,255,255,0.03); }
+        tr:hover { background: rgba(255,255,255,0.04); }
         
         .hash-cell { font-family: 'JetBrains Mono', monospace; color: var(--accent-primary); font-size: 0.85rem; }
-        .badge { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block;}
-        .badge.threat { background: rgba(244,63,94,0.15); color: var(--accent-danger); border: 1px solid rgba(244,63,94,0.3); }
-        .badge.safe { background: rgba(52,211,153,0.15); color: var(--accent-success); border: 1px solid rgba(52,211,153,0.3); }
-        .type-tag { color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.8rem;}
+        .badge { padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-block;}
+        .badge.threat { background: rgba(244,63,94,0.15); color: var(--accent-danger); border: 1px solid rgba(244,63,94,0.3); box-shadow: 0 0 10px rgba(244,63,94,0.1);}
+        .badge.safe { background: rgba(52,211,153,0.15); color: var(--accent-success); border: 1px solid rgba(52,211,153,0.3); box-shadow: 0 0 10px rgba(52,211,153,0.1);}
+        .type-tag { color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.05);}
 
-        /* --- STREAMING_CHUNK:Terminal, Results and Footer --- */
-        .terminal-box { 
-            display: none; margin-top: 2.5rem; background: #050508; border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 16px; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); position: relative; z-index: 20;
-        }
-        .terminal-box.active { display: block; animation: slideUp 0.5s ease; }
-        .term-header { background: rgba(255,255,255,0.05); padding: 0.8rem 1.5rem; display: flex; gap: 0.5rem; border-bottom: 1px solid var(--glass-border); }
-        .term-dot { width: 12px; height: 12px; border-radius: 50%; }
-        .term-dot:nth-child(1) { background: #ff5f56; box-shadow: 0 0 10px #ff5f56; } 
-        .term-dot:nth-child(2) { background: #ffbd2e; box-shadow: 0 0 10px #ffbd2e;} 
-        .term-dot:nth-child(3) { background: #27c93f; box-shadow: 0 0 10px #27c93f;}
-        .term-body { padding: 2rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: #4ade80; line-height: 1.8; text-shadow: 0 0 5px rgba(74, 222, 128, 0.4); position: relative;}
-        .term-body::after { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(0,0,0,0.2) 50%); background-size: 100% 4px; pointer-events: none; }
-        .term-line { opacity: 0; animation: typeLine 0.1s forwards; }
-        @keyframes typeLine { to { opacity: 1; } }
-        .term-line.highlight { color: var(--accent-secondary); text-shadow: 0 0 8px var(--accent-secondary); }
-        .term-line.warn { color: #ffbd2e; text-shadow: 0 0 8px rgba(255, 189, 46, 0.6); }
-
-        .result-container { display: none; margin-top: 2.5rem; border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.5); animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); position: relative; z-index: 20; backdrop-filter: blur(20px);}
-        .result-container.show { display: block; }
-        .result-grid { display: grid; grid-template-columns: 1fr auto; gap: 3rem; padding: 3rem; align-items: center; }
-        @media (max-width: 768px) { .result-grid { grid-template-columns: 1fr; text-align: center; gap: 2rem; padding: 2rem; } }
-        .result-info h3 { font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; margin-bottom: 0.5rem; letter-spacing: -1px; }
-        .danger-text { color: var(--accent-danger); text-shadow: 0 0 20px rgba(244,63,94,0.4); } 
-        .safe-text { color: var(--accent-success); text-shadow: 0 0 20px rgba(52,211,153,0.4); }
-        .result-desc { color: var(--text-muted); line-height: 1.7; font-size: 1.05rem; margin-bottom: 2rem; }
-
-        .circular-chart { width: 140px; height: 140px; drop-shadow: 0 0 10px rgba(255,255,255,0.1); }
-        .circle-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 2.5; }
-        .circle { fill: none; stroke-width: 2.5; stroke-linecap: round; transition: stroke-dasharray 1.5s cubic-bezier(0.16, 1, 0.3, 1); stroke-dasharray: 0, 100;}
-        .danger-theme .circle { stroke: var(--accent-danger); filter: drop-shadow(0 0 12px rgba(244,63,94,0.6)); }
-        .safe-theme .circle { stroke: var(--accent-success); filter: drop-shadow(0 0 12px rgba(52,211,153,0.6)); }
-        .percentage { fill: var(--text-main); font-family: 'Space Grotesk', sans-serif; font-size: 0.6em; text-anchor: middle; font-weight: 700; }
-
-        .zk-proof-box { background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.2); padding: 1.2rem; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1rem; transition: var(--transition-smooth); }
-        .zk-hash { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent-primary); word-break: break-all; }
-
-        /* Credits */
-        .credits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-top: 2rem; }
+        .credits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 2rem; }
         @media (max-width: 768px) { .credits-grid { grid-template-columns: 1fr; } }
-        .credit-card { background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 24px; padding: 2.5rem; transform-style: preserve-3d; position: relative; overflow: hidden;}
-        .credit-card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; color: var(--text-main); margin-bottom: 0.4rem; transform: translateZ(30px); }
-        .role-tag { display: inline-block; padding: 0.4rem 1rem; background: rgba(167, 139, 250, 0.1); color: var(--accent-primary); border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1.8rem; border: 1px solid rgba(167, 139, 250, 0.2); transform: translateZ(25px); }
-        .role-tag.ui-tag { background: rgba(34, 211, 238, 0.1); color: var(--accent-secondary); border-color: rgba(34, 211, 238, 0.2); }
-        .credit-card ul { list-style: none; transform: translateZ(20px); }
-        .credit-card li { position: relative; padding-left: 1.8rem; color: var(--text-muted); margin-bottom: 1rem; font-size: 1rem; line-height: 1.6; }
-        .credit-card li::before { content: '▹'; position: absolute; left: 0; color: var(--accent-primary); font-size: 1.2rem; line-height: 1; top: 2px;}
+        .credit-card { background: rgba(255,255,255,0.015); border: 1px solid var(--glass-border); border-radius: 24px; padding: 3rem; transform-style: preserve-3d; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);}
+        .credit-card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; color: var(--text-main); margin-bottom: 0.5rem; transform: translateZ(40px); letter-spacing: -1px;}
+        .role-tag { display: inline-block; padding: 0.5rem 1.2rem; background: rgba(167, 139, 250, 0.1); color: var(--accent-primary); border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: 2rem; border: 1px solid rgba(167, 139, 250, 0.3); transform: translateZ(30px); }
+        .role-tag.ui-tag { background: rgba(34, 211, 238, 0.1); color: var(--accent-secondary); border-color: rgba(34, 211, 238, 0.3); }
+        .credit-card ul { list-style: none; transform: translateZ(25px); }
+        .credit-card li { position: relative; padding-left: 2rem; color: var(--text-muted); margin-bottom: 1.2rem; font-size: 1.05rem; line-height: 1.7; }
+        .credit-card li::before { content: '▹'; position: absolute; left: 0; color: var(--accent-primary); font-size: 1.3rem; line-height: 1; top: 2px;}
 
-        /* Footer */
-        footer { text-align: center; padding: 4rem 2rem; color: var(--text-muted); font-size: 0.95rem; border-top: 1px solid var(--glass-border); margin-top: 6rem; position: relative; z-index: 10; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); }
-        .footer-brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; margin-bottom: 1rem; color: #fff; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .footer-text { line-height: 1.8; }
+        /* --- STREAMING_CHUNK:Footer --- */
+        footer { text-align: center; padding: 5rem 2rem; color: var(--text-muted); font-size: 1rem; border-top: 1px solid var(--glass-border); margin-top: 8rem; position: relative; z-index: 10; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
+        .footer-brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; margin-bottom: 1.2rem; color: #fff; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 0.8rem; letter-spacing: -0.5px;}
+        .footer-brand img { height: 2.8rem; width: auto; object-fit: contain; }
+        .footer-text { line-height: 1.9; }
         
-        /* HEART BEAT FIX INJECTED HERE */
         .footer-text i.fa-heart { 
             color: var(--accent-danger); 
-            text-shadow: 0 0 15px rgba(244,63,94,0.8); 
+            text-shadow: 0 0 20px rgba(244,63,94,0.8); 
             animation: heartPulse 1.5s infinite; 
-            margin: 0 0.3rem; 
+            margin: 0 0.4rem; 
             display: inline-block; 
         }
         
         @keyframes heartPulse {
             0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(244,63,94,0.5)); }
-            15% { transform: scale(1.25); filter: drop-shadow(0 0 20px rgba(244,63,94,1)); }
+            15% { transform: scale(1.3); filter: drop-shadow(0 0 25px rgba(244,63,94,1)); }
             30% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(244,63,94,0.5)); }
-            45% { transform: scale(1.25); filter: drop-shadow(0 0 20px rgba(244,63,94,1)); }
+            45% { transform: scale(1.3); filter: drop-shadow(0 0 25px rgba(244,63,94,1)); }
             60% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(244,63,94,0.5)); }
             100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(244,63,94,0.5)); }
         }
 
         .footer-name { color: #fff; font-weight: 600; }
-        .spinner { width: 20px; height: 20px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .spinner { width: 22px; height: 22px; border: 3px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
+<canvas id="network-canvas"></canvas>
 <div class="noise-bg"></div>
 <div class="aurora-bg"></div>
 <div class="grid-overlay"></div>
 
+<!-- Live Telemetry Toasts Container -->
+<div id="telemetry-container"></div>
+
+<!-- Custom Cursor Elements -->
 <div class="cursor-dot" id="cursor-dot"></div>
 <div class="cursor-outline" id="cursor-outline"></div>
 
+<!-- --- STREAMING_CHUNK:HTML Structure --- -->
 <nav class="navbar interactable animate-up">
-    <div class="logo">
-        <i class="fas fa-shield-halved"></i> PhishGuard ZK <span class="v2-badge">v2.0</span>
+    <div class="logo interactable">
+        <img src="logo.png" alt="PhishGuard Logo"> PhishGuard ZK <span class="v2-badge">v2.0</span>
     </div>
     <div class="nav-links">
         <div class="nav-item active interactable" data-page="scanner">Scanner</div>
         <div class="nav-item interactable" data-page="dashboard">Ledger</div>
         <div class="nav-item interactable" data-page="about">Architecture</div>
     </div>
+    <!-- Live Time injected here -->
     <div class="system-status interactable">
-        <div class="pulse-dot"></div> Live ZK Node
+        <div class="pulse-dot"></div> <span id="live-time">Syncing...</span>
     </div>
 </nav>
 
@@ -345,15 +470,17 @@
     <!-- SCANNER PAGE -->
     <section id="page-scanner" class="page active">
         <div class="hero animate-up delay-1">
-            <h1 class="text-gradient">Zero-Knowledge. Absolute Security.</h1>
+            <h1 class="text-gradient glitch-text" data-text="Zero-Knowledge. Absolute Security.">Zero-Knowledge. Absolute Security.</h1>
             <p>Enterprise-grade AI threat detection. Your data is analyzed in real-time, converted to cryptographic ZK-proofs, and instantly scrubbed from memory.</p>
         </div>
 
         <div class="tilt-wrapper animate-up delay-2">
-            <div class="glass-panel tilt-card">
+            <!-- VERCEL SPOTLIGHT REVEAL APPLIED HERE -->
+            <div class="glass-panel tilt-card reveal-card">
                 <div class="segmented-control">
-                    <div class="segment-btn active interactable" data-target="pane-url">URL Engine</div>
-                    <div class="segment-btn interactable" data-target="pane-email">Email Header Scan</div>
+                    <div class="segment-pill" id="segment-pill"></div>
+                    <div class="segment-btn active interactable" data-target="pane-url" onclick="movePill(0)">URL Engine</div>
+                    <div class="segment-btn interactable" data-target="pane-email" onclick="movePill(1)">Email Header Scan</div>
                 </div>
 
                 <div id="pane-url" class="input-wrapper active">
@@ -366,13 +493,13 @@
                 </div>
 
                 <div class="btn-group">
-                    <div class="magnetic-wrap wrap-primary interactable" id="mag-scan">
-                        <button class="btn-primary" id="scan-btn">
+                    <div class="magnetic-wrap wrap-primary" id="mag-scan">
+                        <button class="btn-primary interactable" id="scan-btn">
                             <i class="fas fa-bolt"></i> <span id="scan-label">Initialize Scan Sequence</span>
                         </button>
                     </div>
-                    <div class="magnetic-wrap interactable" id="mag-demo">
-                        <button class="btn-secondary" id="demo-btn" title="Load Demo Data">
+                    <div class="magnetic-wrap" id="mag-demo">
+                        <button class="btn-secondary interactable" id="demo-btn" title="Load Demo Data">
                             <i class="fas fa-flask"></i>
                         </button>
                     </div>
@@ -393,20 +520,20 @@
                             
                             <div class="zk-proof-box interactable">
                                 <div>
-                                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem; letter-spacing: 1px; text-transform: uppercase;">Cryptographic Hash (Data Scrubbed)</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: 1.5px; text-transform: uppercase;">Cryptographic Hash (Data Scrubbed)</div>
                                     <div class="zk-hash" id="res-hash">0x...</div>
                                 </div>
-                                <i class="fas fa-check-circle" id="res-icon" style="color: var(--accent-success); font-size: 1.5rem;"></i>
+                                <i class="fas fa-check-circle" id="res-icon" style="color: var(--accent-success); font-size: 1.8rem; filter: drop-shadow(0 0 10px rgba(52,211,153,0.5));"></i>
                             </div>
                         </div>
                         
-                        <div class="result-gauge">
+                        <div class="result-gauge interactable">
                             <svg viewBox="0 0 36 36" class="circular-chart">
                                 <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                                 <path class="circle" id="res-circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                                 <text x="18" y="20.35" class="percentage" id="res-score">0%</text>
                             </svg>
-                            <div style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem; font-weight: 500; letter-spacing: 1px;">THREAT PROBABILITY</div>
+                            <div style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-top: 1.2rem; font-weight: 600; letter-spacing: 1.5px;">THREAT PROBABILITY</div>
                         </div>
                     </div>
                 </div>
@@ -414,32 +541,32 @@
         </div>
     </section>
 
+    <!-- LEDGER PAGE -->
     <section id="page-dashboard" class="page">
         <div class="hero">
             <h1 class="text-gradient">Zero-Knowledge Ledger</h1>
-            <p>Live, anonymized telemetry tracking active network scans and neutralized threats in real-time.</p>
+            <p>Live, anonymized telemetry tracking active network scans and neutralized threats in real-time across the globe.</p>
         </div>
 
         <div class="dash-grid">
-            <div class="stat-card">
+            <!-- VERCEL SPOTLIGHT REVEAL APPLIED HERE -->
+            <div class="stat-card tilt-card reveal-card interactable">
                 <div class="stat-title">Total Scans Processed</div>
-                <!-- CHANGED TO 0 FOR ANIMATION -->
                 <div class="stat-value cyan" id="stat-total">0</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card tilt-card reveal-card interactable">
                 <div class="stat-title">Threats Neutralized</div>
-                <!-- CHANGED TO 0 FOR ANIMATION -->
                 <div class="stat-value red" id="stat-threats">0</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card tilt-card reveal-card interactable">
                 <div class="stat-title">Safe Nodes Verified</div>
-                <!-- CHANGED TO 0 FOR ANIMATION -->
                 <div class="stat-value green" id="stat-safe">0</div>
             </div>
         </div>
 
-        <div class="ledger-container">
-            <div class="ledger-header">
+        <!-- VERCEL SPOTLIGHT REVEAL APPLIED HERE -->
+        <div class="ledger-container reveal-card">
+            <div class="ledger-header interactable">
                 <h3>Live Network Activity</h3>
                 <div class="pulse-live"><div class="pulse-dot"></div> Syncing Data...</div>
             </div>
@@ -454,7 +581,7 @@
                         </tr>
                     </thead>
                     <tbody id="ledger-body">
-                        <!-- Populated by JS -->
+                        <!-- Populated dynamically -->
                     </tbody>
                 </table>
             </div>
@@ -468,10 +595,11 @@
             <p>Engineered from the ground up to process complex cryptographic threats while maintaining absolute zero-knowledge privacy.</p>
         </div>
 
-        <div class="tilt-wrapper">
-            <div class="glass-panel tilt-card">
+        <div class="tilt-wrapper" style="max-width: 1000px;">
+            <!-- VERCEL SPOTLIGHT REVEAL APPLIED HERE -->
+            <div class="glass-panel tilt-card reveal-card">
                 <div class="credits-grid">
-                    <div class="credit-card tilt-card">
+                    <div class="credit-card tilt-card interactable">
                         <h3>Naishal Nadiya</h3>
                         <div class="role-tag">Lead Full-Stack Developer</div>
                         <ul>
@@ -481,7 +609,7 @@
                             <li>Built and designed the proprietary Browser Extension.</li>
                         </ul>
                     </div>
-                    <div class="credit-card ui-card tilt-card">
+                    <div class="credit-card ui-card tilt-card interactable">
                         <h3>Sruthika Ramawat</h3>
                         <div class="role-tag ui-tag">Initial UI Concept Contributor</div>
                         <ul>
@@ -497,8 +625,8 @@
 </main>
 
 <footer class="animate-up delay-3">
-    <div class="footer-brand">
-        <i class="fas fa-shield-halved"></i> PhishGuard ZK
+    <div class="footer-brand interactable">
+        <img src="logo.png" alt="PhishGuard Logo"> PhishGuard ZK
     </div>
     <p class="footer-text">
         Built with <i class="fas fa-heart"></i> for a safer, private web by <br/>
@@ -507,82 +635,165 @@
 </footer>
 
 <script>
-    // --- STREAMING_CHUNK:Dashboard Data variables moved to top ---
-    let totalScans = 1402, threatCount = 348, safeCount = 1054;
+    // --- STREAMING_CHUNK:Javascript Setup & Logic ---
+    // BUG FIX (TDZ Error Resolved): Mouse coordinates declared at the very top.
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
 
-    // --- STREAMING_CHUNK:Javascript Logic, Animations and Mock Ledger... ---
+    // ----------------------------------------------------
+    // 1. LIVE TIME & CANVAS NETWORK BACKGROUND
+    // ----------------------------------------------------
+    const updateTime = () => {
+        const now = new Date();
+        document.getElementById('live-time').innerText = now.toLocaleTimeString([], { hour12: false });
+    };
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // Neural Network Particle System
+    const canvas = document.getElementById('network-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, particles;
+
+    function initCanvas() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        particles = [];
+        const numParticles = window.innerWidth < 768 ? 30 : 80; 
+        for (let i = 0; i < numParticles; i++) {
+            particles.push({
+                x: Math.random() * width, y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 1.0, vy: (Math.random() - 0.5) * 1.0,
+                radius: Math.random() * 1.5 + 0.5
+            });
+        }
+    }
+
+    function animateCanvas() {
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = 'rgba(34, 211, 238, 0.4)';
+        ctx.lineWidth = 0.5;
+
+        particles.forEach(p => {
+            p.x += p.vx; p.y += p.vy;
+            if (p.x < 0 || p.x > width) p.vx *= -1;
+            if (p.y < 0 || p.y > height) p.vy *= -1;
+            
+            // Mouse Repel Physics 
+            const dx = mouseX - p.x; const dy = mouseY - p.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 150) {
+                p.x -= dx * 0.02; p.y -= dy * 0.02;
+            }
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < 120) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(167, 139, 250, ${(1 - dist/120) * 0.3})`;
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(animateCanvas);
+    }
     
-    // Smooth Cursor
+    window.addEventListener('resize', initCanvas);
+    initCanvas(); 
+    animateCanvas();
+
+    // ----------------------------------------------------
+    // 2. FIXED ADVANCED SMOOTH CURSOR & SPOTLIGHT REVEAL
+    // ----------------------------------------------------
     const cursorDot = document.getElementById('cursor-dot');
     const cursorOutline = document.getElementById('cursor-outline');
-    let mouseX = 0, mouseY = 0, outlineX = 0, outlineY = 0;
+    
+    // BUG FIX: Removed 'let outlineX = mouseX' to prevent variable shadowing issues.
+    let outlineX = window.innerWidth / 2;
+    let outlineY = window.innerHeight / 2;
     
     window.addEventListener('mousemove', (e) => {
         mouseX = e.clientX; mouseY = e.clientY;
-        cursorDot.style.left = `${mouseX}px`; 
-        cursorDot.style.top = `${mouseY}px`;
+        
+        cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+
+        document.querySelectorAll('.reveal-card').forEach(card => {
+            const rect = card.getBoundingClientRect();
+            card.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+            card.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
+        });
     });
 
-    function animateCursor() {
-        outlineX += (mouseX - outlineX) * 0.2;
+    const animateCursorLoop = () => {
+        outlineX += (mouseX - outlineX) * 0.2; 
         outlineY += (mouseY - outlineY) * 0.2;
-        cursorOutline.style.left = `${outlineX}px`;
-        cursorOutline.style.top = `${outlineY}px`;
-        requestAnimationFrame(animateCursor);
-    }
-    animateCursor();
+        cursorOutline.style.transform = `translate3d(${outlineX}px, ${outlineY}px, 0) translate(-50%, -50%)`;
+        requestAnimationFrame(animateCursorLoop);
+    };
+    requestAnimationFrame(animateCursorLoop);
 
-    document.querySelectorAll('.interactable').forEach(el => {
-        el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-        el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+    const interactables = document.querySelectorAll('.interactable, a, button, input, textarea');
+    interactables.forEach(el => {
+        el.addEventListener('mouseenter', () => cursorOutline.classList.add('cursor-hover'));
+        el.addEventListener('mouseleave', () => cursorOutline.classList.remove('cursor-hover'));
     });
 
-    // 3D LERP Smooth Tilt
+    // ----------------------------------------------------
+    // 3. 3D TILT EFFECT & MAGNETIC BUTTONS
+    // ----------------------------------------------------
     document.querySelectorAll('.tilt-card').forEach(card => {
         const glare = document.createElement('div');
-        glare.className = 'glare';
-        card.appendChild(glare);
+        glare.className = 'glare'; card.appendChild(glare);
 
         let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
         let targetOpacity = 0, currentOpacity = 0, targetScale = 1, currentScale = 1;
 
-        card.addEventListener('mouseenter', () => { targetScale = 1.01; targetOpacity = 1; });
+        card.addEventListener('mouseenter', () => { targetScale = 1.02; targetOpacity = 1; });
         card.addEventListener('mousemove', (e) => {
             const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left, y = e.clientY - rect.top;
-            targetX = ((y - (rect.height/2)) / (rect.height/2)) * -4; 
-            targetY = ((x - (rect.width/2)) / (rect.width/2)) * 4;
+            const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+            targetX = ((y - (rect.height/2)) / (rect.height/2)) * -5; 
+            targetY = ((x - (rect.width/2)) / (rect.width/2)) * 5;
             glare.style.transform = `translate(${x}px, ${y}px)`;
         });
         card.addEventListener('mouseleave', () => { targetX = 0; targetY = 0; targetScale = 1; targetOpacity = 0; });
 
-        function render3D() {
-            currentX += (targetX - currentX) * 0.1;
-            currentY += (targetY - currentY) * 0.1;
-            currentScale += (targetScale - currentScale) * 0.1;
-            currentOpacity += (targetOpacity - currentOpacity) * 0.1;
-
-            card.style.transform = `perspective(1200px) rotateX(${currentX}deg) rotateY(${currentY}deg) scale3d(${currentScale}, ${currentScale}, ${currentScale})`;
-            glare.style.opacity = currentOpacity;
-            requestAnimationFrame(render3D);
+        const render3D = () => {
+            currentX += (targetX - currentX) * 0.1; currentY += (targetY - currentY) * 0.1;
+            currentScale += (targetScale - currentScale) * 0.1; currentOpacity += (targetOpacity - currentOpacity) * 0.1;
+            card.style.transform = `perspective(1500px) rotateX(${currentX}deg) rotateY(${currentY}deg) scale3d(${currentScale}, ${currentScale}, ${currentScale})`;
+            glare.style.opacity = currentOpacity; requestAnimationFrame(render3D);
         }
         render3D();
     });
 
-    // Magnetic Buttons (Fixed wrapper logic)
     document.querySelectorAll('.magnetic-wrap').forEach(wrap => {
         const btn = wrap.firstElementChild;
         wrap.addEventListener('mousemove', (e) => {
             const rect = wrap.getBoundingClientRect();
-            const x = e.clientX - rect.left - (rect.width / 2);
-            const y = e.clientY - rect.top - (rect.height / 2);
-            btn.style.transform = `translate(${x * 0.25}px, ${y * 0.25}px)`;
+            const x = e.clientX - rect.left - (rect.width / 2); const y = e.clientY - rect.top - (rect.height / 2);
+            btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
         });
         wrap.addEventListener('mouseleave', () => { btn.style.transform = `translate(0px, 0px)`; });
     });
 
+    // ----------------------------------------------------
+    // 4. MOCK DATA, TELEMETRY TOASTS & NAVIGATION
+    // ----------------------------------------------------
+    let totalScans = 1402, threatCount = 348, safeCount = 1054;
+    let statsAnimated = false;
 
-    // --- STAT COUNTER ANIMATION ADDED HERE ---
     function animateCounter(el, target, duration) {
         let startTimestamp = null;
         const step = (timestamp) => {
@@ -590,17 +801,11 @@
             const progress = Math.min((timestamp - startTimestamp) / duration, 1);
             const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
             el.innerText = Math.floor(easeProgress * target).toLocaleString();
-            if (progress < 1) {
-                window.requestAnimationFrame(step);
-            } else {
-                el.innerText = target.toLocaleString();
-            }
+            if (progress < 1) window.requestAnimationFrame(step);
+            else el.innerText = target.toLocaleString();
         };
         window.requestAnimationFrame(step);
     }
-
-    // Navigation Logic
-    let statsAnimated = false; // Track if stats have run
 
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => {
@@ -612,11 +817,8 @@
             targetPage.classList.add('active');
             
             const animatedEls = targetPage.querySelectorAll('.animate-up');
-            animatedEls.forEach(el => {
-                el.style.animation = 'none'; el.offsetHeight; el.style.animation = null; 
-            });
+            animatedEls.forEach(el => { el.style.animation = 'none'; el.offsetHeight; el.style.animation = null; });
 
-            // Trigger Dashboard Animation
             if (item.dataset.page === 'dashboard' && !statsAnimated) {
                 animateCounter(document.getElementById('stat-total'), totalScans, 2000);
                 animateCounter(document.getElementById('stat-threats'), threatCount, 2000);
@@ -626,9 +828,13 @@
         });
     });
 
-    // Scanner Tabs
     let activeTab = "url";
-    document.querySelectorAll('.segment-btn').forEach(btn => {
+    window.movePill = function(index) {
+        const pill = document.getElementById('segment-pill');
+        pill.style.transform = `translateX(${index * 100}%)`;
+    }
+
+    document.querySelectorAll('.segment-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.input-wrapper').forEach(w => w.classList.remove('active'));
@@ -644,10 +850,8 @@
         if(activeTab === 'url') document.getElementById('url-input').value = "https://update-security-alert-verify.com/login";
         else document.getElementById('email-input').value = "URGENT: Your account will be locked in 2 hours. Click here to verify identity.";
     });
-    
-    function generateRandomHash() {
-        return "0xZK_" + Array.from({length: 16}, () => Math.floor(Math.random()*16).toString(16)).join('').toUpperCase();
-    }
+
+    function generateRandomHash() { return "0xZK_" + Array.from({length: 16}, () => Math.floor(Math.random()*16).toString(16)).join('').toUpperCase(); }
 
     function addLedgerEntry(type, verdictClass, verdictText) {
         const tbody = document.getElementById('ledger-body');
@@ -666,21 +870,48 @@
         return hash;
     }
 
-    // Initial Ledger Population
-    for(let i=0; i<5; i++) {
-        addLedgerEntry(Math.random() > 0.5 ? 'URL' : 'Email', Math.random() > 0.7 ? 'threat' : 'safe', Math.random() > 0.7 ? 'Threat' : 'Safe');
+    // Populate initial ledger
+    for(let i=0; i<5; i++) { addLedgerEntry(Math.random() > 0.5 ? 'URL' : 'Email', Math.random() > 0.7 ? 'threat' : 'safe', Math.random() > 0.7 ? 'Threat' : 'Safe'); }
+
+    // Live Telemetry Toasts System
+    function spawnToast() {
+        const container = document.getElementById('telemetry-container');
+        const isThreat = Math.random() > 0.4; // 60% chance of threat
+        const hash = generateRandomHash().substring(0, 12) + "...";
+        const regions = ['EU Node', 'US-East', 'AP-South', 'RU-West'];
+        const region = regions[Math.floor(Math.random() * regions.length)];
+        
+        const toast = document.createElement('div');
+        toast.className = `telemetry-toast ${isThreat ? 'danger' : ''}`;
+        toast.innerHTML = `
+            <i class="fas ${isThreat ? 'fa-shield-virus' : 'fa-check-circle'}" style="color: ${isThreat ? 'var(--accent-danger)' : 'var(--accent-success)'}"></i>
+            <span>[${region}] ${isThreat ? 'Threat Neutralized' : 'Node Verified'}: <span style="color:var(--accent-primary)">${hash}</span></span>
+        `;
+        
+        container.appendChild(toast);
+        // Clean up DOM after animation
+        setTimeout(() => { if(container.contains(toast)) container.removeChild(toast); }, 4500);
+        
+        // Randomize next toast (between 4 to 10 seconds)
+        setTimeout(spawnToast, Math.floor(Math.random() * 6000) + 4000);
     }
+    setTimeout(spawnToast, 3000); // Start after 3s
 
     async function typeTerminal(lines) {
-        const content = document.getElementById('term-content');
-        content.innerHTML = '';
+        const content = document.getElementById('term-content'); content.innerHTML = '';
         for (let i = 0; i < lines.length; i++) {
             const line = document.createElement('div');
-            line.className = 'term-line' + (i === lines.length - 1 ? ' highlight' : '');
-            if (lines[i].includes('[!]')) line.className = 'term-line warn';
-            line.textContent = `> ${lines[i]}`;
+            line.className = 'term-line blinking-cursor'; 
+            if (lines[i].includes('[!]')) line.className += ' warn';
             content.appendChild(line);
-            await new Promise(r => setTimeout(r, 450)); 
+            
+            let text = `> ${lines[i]}`;
+            for (let j = 0; j <= text.length; j++) {
+                line.textContent = text.slice(0, j); await new Promise(r => setTimeout(r, 15)); 
+            }
+            line.classList.remove('blinking-cursor');
+            if (i === lines.length - 1) line.classList.add('highlight');
+            await new Promise(r => setTimeout(r, 400)); 
         }
     }
 
@@ -690,11 +921,9 @@
 
         this.disabled = true;
         document.getElementById('scan-label').innerHTML = '<div class="spinner"></div>';
-        
         document.getElementById('result-panel').classList.remove('show');
         document.getElementById('scan-terminal').classList.add('active');
 
-        // Contextual Terminal Output
         let terminalSequence = [];
         if (activeTab === 'url') {
             let domain = "target";
@@ -720,19 +949,17 @@
 
         await typeTerminal(terminalSequence);
 
-        // Mock Verdict Logic
         const isPhish = val.includes('verify') || val.includes('alert') || val.includes('urgent') || activeTab === 'email';
         const score = isPhish ? Math.floor(Math.random() * (99 - 85) + 85) : Math.floor(Math.random() * (20 - 5) + 5);
         const zkHash = addLedgerEntry(activeTab.toUpperCase(), isPhish ? 'threat' : 'safe', isPhish ? 'Threat' : 'Safe');
 
-        // Update Dashboard Stats
-        totalScans++;
-        if(isPhish) threatCount++; else safeCount++;
+        totalScans++; if(isPhish) threatCount++; else safeCount++;
         
-        // Dynamically animate the updated numbers when a new scan runs
-        animateCounter(document.getElementById('stat-total'), totalScans, 1000);
-        animateCounter(document.getElementById('stat-threats'), threatCount, 1000);
-        animateCounter(document.getElementById('stat-safe'), safeCount, 1000);
+        if (statsAnimated) {
+            animateCounter(document.getElementById('stat-total'), totalScans, 1000);
+            animateCounter(document.getElementById('stat-threats'), threatCount, 1000);
+            animateCounter(document.getElementById('stat-safe'), safeCount, 1000);
+        }
 
         const panel = document.getElementById('result-panel');
         const circle = document.getElementById('res-circle');
@@ -751,12 +978,10 @@
 
         panel.classList.add('show');
         
-        // Circular progress animation
-        circle.style.strokeDasharray = `0, 100`; // Reset
+        circle.style.strokeDasharray = `0, 100`; 
         setTimeout(() => {
             circle.style.strokeDasharray = `${score}, 100`;
-            let count = 0;
-            const scoreText = document.getElementById('res-score');
+            let count = 0; const scoreText = document.getElementById('res-score');
             const interval = setInterval(() => {
                 if(count >= score) clearInterval(interval);
                 else { count++; scoreText.textContent = count + '%'; }
