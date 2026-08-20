@@ -38,7 +38,7 @@
         }
 
         /* Re-enable default cursor on touch devices */
-        @media (hover: none) and (pointer: coarse) {
+        @media (pointer: coarse) {
             * { cursor: auto !important; }
             .cursor-dot, .cursor-outline { display: none !important; }
         }
@@ -53,28 +53,23 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* --- STREAMING_CHUNK:Cursor --- */
+        /* ------------------------------------------------ */
+        /* EXACT PREVIOUS CURSOR STYLES INJECTED HERE */
+        /* ------------------------------------------------ */
         .cursor-dot, .cursor-outline {
-            position: fixed; top: 0; left: 0;
-            border-radius: 50%; z-index: 99999; pointer-events: none;
-            /* Use hardware acceleration */
-            will-change: transform;
+            position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
+            border-radius: 50%; z-index: 999999; pointer-events: none;
+            mix-blend-mode: difference;
         }
         .cursor-dot { 
-            width: 6px; height: 6px; background-color: var(--accent-secondary); 
-            box-shadow: 0 0 10px var(--accent-secondary);
-            /* Centering compensation done in JS */
+            width: 8px; height: 8px; background-color: #fff; 
         }
         .cursor-outline {
-            width: 40px; height: 40px; 
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+            width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.5);
+            transition: width 0.3s ease, height 0.3s ease, background 0.3s ease;
         }
-        .cursor-hover { 
-            width: 65px; height: 65px; 
-            background-color: rgba(255, 255, 255, 0.05); 
-            border-color: rgba(34, 211, 238, 0.5); 
-            backdrop-filter: blur(2px);
+        body.cursor-hover .cursor-outline { 
+            width: 70px; height: 70px; background: rgba(255,255,255,1); border-color: transparent; 
         }
 
         #network-canvas {
@@ -82,7 +77,7 @@
             z-index: -1; pointer-events: none; opacity: 0.5;
         }
         
-        /* --- STREAMING_CHUNK:Background Effects --- */
+        /* */
         .noise-bg {
             position: fixed; inset: 0; z-index: -2; opacity: 0.05; pointer-events: none;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -122,7 +117,7 @@
             .reveal-card:hover::before, .reveal-card:hover::after { opacity: 1; }
         }
 
-        /* --- STREAMING_CHUNK:Telemetry Toast --- */
+        /* */
         #telemetry-container {
             position: fixed; bottom: 20px; left: 20px; z-index: 999;
             display: flex; flex-direction: column; gap: 10px; pointer-events: none;
@@ -141,7 +136,7 @@
         @keyframes slideInToast { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOutToast { to { opacity: 0; transform: translateY(10px); filter: blur(5px); } }
 
-        /* --- STREAMING_CHUNK:Navbar and Layout --- */
+        /* */
         .navbar {
             display: flex; justify-content: space-between; align-items: center;
             padding: 1.5rem 5%; position: sticky; top: 0; z-index: 100;
@@ -154,7 +149,6 @@
             font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.6rem; 
             display: flex; align-items: center; gap: 0.8rem; letter-spacing: -0.5px; 
         }
-        /* Increased logo size and removed shadow as Sruthika's design has it naturally */
         .logo img { height: 2.8rem; width: auto; object-fit: contain; transform: scale(1.1); transition: transform 0.3s ease; }
         .logo:hover img { transform: scale(1.15); }
         
@@ -197,23 +191,6 @@
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); filter: blur(5px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
 
-        /* --- STREAMING_CHUNK:Hero and Glitch Text --- */
-        .glitch-text { position: relative; display: inline-block; }
-        .glitch-text::before, .glitch-text::after {
-            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: transparent; opacity: 0; pointer-events: none;
-        }
-        .glitch-text:hover::before {
-            left: 2px; text-shadow: -2px 0 var(--accent-danger); clip: rect(24px, 550px, 90px, 0);
-            animation: glitch-anim-2 3s infinite linear alternate-reverse; opacity: 1; z-index: 2;
-        }
-        .glitch-text:hover::after {
-            left: -2px; text-shadow: -2px 0 var(--accent-secondary); clip: rect(85px, 550px, 140px, 0);
-            animation: glitch-anim 2.5s infinite linear alternate-reverse; opacity: 1; z-index: 2;
-        }
-        @keyframes glitch-anim { 0% { clip: rect(10px, 9999px, 86px, 0); } 100% { clip: rect(20px, 9999px, 85px, 0); } }
-        @keyframes glitch-anim-2 { 0% { clip: rect(65px, 9999px, 10px, 0); } 100% { clip: rect(80px, 9999px, 50px, 0); } }
-
         .hero { text-align: center; margin-bottom: 5rem; position: relative; z-index: 10; }
         .hero h1 { 
             font-family: 'Space Grotesk', sans-serif; font-size: clamp(3rem, 6vw, 6rem); 
@@ -228,7 +205,7 @@
         @keyframes shine { to { background-position: 200% center; } }
         .hero p { color: var(--text-muted); font-size: 1.2rem; max-width: 700px; margin: 0 auto; line-height: 1.8; font-weight: 400; }
 
-        /* --- STREAMING_CHUNK:Engine UI Elements --- */
+        /* */
         .tilt-wrapper { perspective: 2000px; transform-style: preserve-3d; margin: 0 auto; max-width: 800px;}
         .glass-panel {
             background: var(--glass-bg); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
@@ -299,7 +276,7 @@
             color: var(--accent-secondary); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(34, 211, 238, 0.15);
         }
 
-        /* --- STREAMING_CHUNK:Terminal and Ledger Styles --- */
+        /* */
         .terminal-box { 
             display: none; margin-top: 3rem; background: #050508; border: 1px solid var(--glass-border); 
             border-radius: 20px; overflow: hidden; box-shadow: inset 0 0 30px rgba(0,0,0,0.9), 0 20px 40px rgba(0,0,0,0.5); 
@@ -408,7 +385,7 @@
         .credit-card li { position: relative; padding-left: 2rem; color: var(--text-muted); margin-bottom: 1.2rem; font-size: 1.05rem; line-height: 1.7; }
         .credit-card li::before { content: '▹'; position: absolute; left: 0; color: var(--accent-primary); font-size: 1.3rem; line-height: 1; top: 2px;}
 
-        /* --- STREAMING_CHUNK:Footer --- */
+        /* */
         footer { text-align: center; padding: 5rem 2rem; color: var(--text-muted); font-size: 1rem; border-top: 1px solid var(--glass-border); margin-top: 8rem; position: relative; z-index: 10; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
         .footer-brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; margin-bottom: 1.2rem; color: #fff; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 0.8rem; letter-spacing: -0.5px;}
         .footer-brand img { height: 2.8rem; width: auto; object-fit: contain; }
@@ -450,7 +427,7 @@
 <div class="cursor-dot" id="cursor-dot"></div>
 <div class="cursor-outline" id="cursor-outline"></div>
 
-<!-- --- STREAMING_CHUNK:HTML Structure --- -->
+<!-- -->
 <nav class="navbar interactable animate-up">
     <div class="logo interactable">
         <img src="logo.png" alt="PhishGuard Logo"> PhishGuard ZK <span class="v2-badge">v2.0</span>
@@ -470,7 +447,7 @@
     <!-- SCANNER PAGE -->
     <section id="page-scanner" class="page active">
         <div class="hero animate-up delay-1">
-            <h1 class="text-gradient glitch-text" data-text="Zero-Knowledge. Absolute Security.">Zero-Knowledge. Absolute Security.</h1>
+            <h1 class="text-gradient" data-text="Zero-Knowledge. Absolute Security.">Zero-Knowledge. Absolute Security.</h1>
             <p>Enterprise-grade AI threat detection. Your data is analyzed in real-time, converted to cryptographic ZK-proofs, and instantly scrubbed from memory.</p>
         </div>
 
@@ -616,6 +593,7 @@
                             <li>Contributed to the initial frontend layout and structural design language.</li>
                             <li>Helped establish the base visual ecosystem during the MLH Hackathon phase.</li>
                             <li>Collaborated on early-stage wireframes prior to the v2.0 AI-driven UI upgrade.</li>
+                            <li>Logo Designer.</li>
                         </ul>
                     </div>
                 </div>
@@ -630,13 +608,12 @@
     </div>
     <p class="footer-text">
         Built with <i class="fas fa-heart"></i> for a safer, private web by <br/>
-        <span class="footer-name">Naishal Nadiya</span> (Lead) & <span class="footer-name">Sruthika</span> (UI Concept).
+        <span class="footer-name">Naishal Nadiya</span> (Lead) & <span class="footer-name">Sruthika</span> (UI Concept & Logo Designer).
     </p>
 </footer>
 
 <script>
-    // --- STREAMING_CHUNK:Javascript Setup & Logic ---
-    // BUG FIX (TDZ Error Resolved): Mouse coordinates declared at the very top.
+    /* */
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
 
@@ -719,14 +696,15 @@
     const cursorDot = document.getElementById('cursor-dot');
     const cursorOutline = document.getElementById('cursor-outline');
     
-    // BUG FIX: Removed 'let outlineX = mouseX' to prevent variable shadowing issues.
     let outlineX = window.innerWidth / 2;
     let outlineY = window.innerHeight / 2;
     
     window.addEventListener('mousemove', (e) => {
         mouseX = e.clientX; mouseY = e.clientY;
         
-        cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+        // Exact Logic from previous file added back
+        cursorDot.style.left = `${mouseX}px`; 
+        cursorDot.style.top = `${mouseY}px`;
 
         document.querySelectorAll('.reveal-card').forEach(card => {
             const rect = card.getBoundingClientRect();
@@ -738,15 +716,24 @@
     const animateCursorLoop = () => {
         outlineX += (mouseX - outlineX) * 0.2; 
         outlineY += (mouseY - outlineY) * 0.2;
-        cursorOutline.style.transform = `translate3d(${outlineX}px, ${outlineY}px, 0) translate(-50%, -50%)`;
+        
+        // Exact Logic from previous file added back
+        cursorOutline.style.left = `${outlineX}px`;
+        cursorOutline.style.top = `${outlineY}px`;
+        
         requestAnimationFrame(animateCursorLoop);
     };
     requestAnimationFrame(animateCursorLoop);
 
     const interactables = document.querySelectorAll('.interactable, a, button, input, textarea');
     interactables.forEach(el => {
-        el.addEventListener('mouseenter', () => cursorOutline.classList.add('cursor-hover'));
-        el.addEventListener('mouseleave', () => cursorOutline.classList.remove('cursor-hover'));
+        el.addEventListener('mouseenter', () => {
+            // Adds the hover effect class to the body just like the previous code
+            document.body.classList.add('cursor-hover');
+        });
+        el.addEventListener('mouseleave', () => {
+            document.body.classList.remove('cursor-hover');
+        });
     });
 
     // ----------------------------------------------------
@@ -834,6 +821,7 @@
         pill.style.transform = `translateX(${index * 100}%)`;
     }
 
+    /* */
     document.querySelectorAll('.segment-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
@@ -846,151 +834,104 @@
         });
     });
 
-    document.getElementById('demo-btn').addEventListener('click', () => {
-        if(activeTab === 'url') document.getElementById('url-input').value = "https://update-security-alert-verify.com/login";
-        else document.getElementById('email-input').value = "URGENT: Your account will be locked in 2 hours. Click here to verify identity.";
-    });
+    const scanBtn = document.getElementById('scan-btn');
+    const demoBtn = document.getElementById('demo-btn');
+    const terminal = document.getElementById('scan-terminal');
+    const termContent = document.getElementById('term-content');
+    const resultPanel = document.getElementById('result-panel');
 
-    function generateRandomHash() { return "0xZK_" + Array.from({length: 16}, () => Math.floor(Math.random()*16).toString(16)).join('').toUpperCase(); }
-
-    function addLedgerEntry(type, verdictClass, verdictText) {
-        const tbody = document.getElementById('ledger-body');
-        const hash = generateRandomHash();
-        const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-        
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td class="hash-cell">${hash}</td>
-            <td><span class="type-tag">${type}</span></td>
-            <td><span class="badge ${verdictClass}">${verdictText}</span></td>
-            <td style="color:var(--text-muted); font-size:0.85rem;">${time}</td>
-        `;
-        tbody.prepend(row);
-        if(tbody.children.length > 6) tbody.lastElementChild.remove();
-        return hash;
-    }
-
-    // Populate initial ledger
-    for(let i=0; i<5; i++) { addLedgerEntry(Math.random() > 0.5 ? 'URL' : 'Email', Math.random() > 0.7 ? 'threat' : 'safe', Math.random() > 0.7 ? 'Threat' : 'Safe'); }
-
-    // Live Telemetry Toasts System
-    function spawnToast() {
+    function showToast(msg, type='success') {
         const container = document.getElementById('telemetry-container');
-        const isThreat = Math.random() > 0.4; // 60% chance of threat
-        const hash = generateRandomHash().substring(0, 12) + "...";
-        const regions = ['EU Node', 'US-East', 'AP-South', 'RU-West'];
-        const region = regions[Math.floor(Math.random() * regions.length)];
-        
         const toast = document.createElement('div');
-        toast.className = `telemetry-toast ${isThreat ? 'danger' : ''}`;
-        toast.innerHTML = `
-            <i class="fas ${isThreat ? 'fa-shield-virus' : 'fa-check-circle'}" style="color: ${isThreat ? 'var(--accent-danger)' : 'var(--accent-success)'}"></i>
-            <span>[${region}] ${isThreat ? 'Threat Neutralized' : 'Node Verified'}: <span style="color:var(--accent-primary)">${hash}</span></span>
-        `;
-        
+        toast.className = `telemetry-toast ${type}`;
+        const icon = type === 'danger' ? 'fa-shield-virus' : 'fa-check-circle';
+        toast.innerHTML = `<i class="fas ${icon}"></i> ${msg}`;
         container.appendChild(toast);
-        // Clean up DOM after animation
-        setTimeout(() => { if(container.contains(toast)) container.removeChild(toast); }, 4500);
-        
-        // Randomize next toast (between 4 to 10 seconds)
-        setTimeout(spawnToast, Math.floor(Math.random() * 6000) + 4000);
-    }
-    setTimeout(spawnToast, 3000); // Start after 3s
-
-    async function typeTerminal(lines) {
-        const content = document.getElementById('term-content'); content.innerHTML = '';
-        for (let i = 0; i < lines.length; i++) {
-            const line = document.createElement('div');
-            line.className = 'term-line blinking-cursor'; 
-            if (lines[i].includes('[!]')) line.className += ' warn';
-            content.appendChild(line);
-            
-            let text = `> ${lines[i]}`;
-            for (let j = 0; j <= text.length; j++) {
-                line.textContent = text.slice(0, j); await new Promise(r => setTimeout(r, 15)); 
-            }
-            line.classList.remove('blinking-cursor');
-            if (i === lines.length - 1) line.classList.add('highlight');
-            await new Promise(r => setTimeout(r, 400)); 
-        }
+        setTimeout(() => { toast.remove(); }, 4500);
     }
 
-    document.getElementById('scan-btn').addEventListener('click', async function() {
-        const val = document.getElementById(activeTab + '-input').value.trim();
-        if(!val) return;
-
-        this.disabled = true;
-        document.getElementById('scan-label').innerHTML = '<div class="spinner"></div>';
-        document.getElementById('result-panel').classList.remove('show');
-        document.getElementById('scan-terminal').classList.add('active');
-
-        let terminalSequence = [];
-        if (activeTab === 'url') {
-            let domain = "target";
-            try { domain = new URL(val.startsWith('http') ? val : 'https://' + val).hostname; } catch(e) {}
-            terminalSequence = [
-                `Extracting domain context: [ ${domain} ]`,
-                "Querying Global Threat Datasets (OpenPhish, PhishTank)...",
-                "[!] STATUS: Target NOT found in static blacklists (Dataset Miss).",
-                "Initiating Zero-Knowledge handoff to AI Engine...",
-                "Connecting to Groq Llama 3.1 Node [Temp: 0.0]...",
-                "RAM Scrubbed. Generating SHA-256 cryptographic proof..."
-            ];
+    demoBtn.addEventListener('click', () => {
+        if(activeTab === 'url') {
+            document.getElementById('url-input').value = 'https://verify-secure-login.com/auth';
         } else {
-            terminalSequence = [
-                "Establishing secure encrypted tunnel...",
-                "Parsing raw email headers and neutralizing payload...",
-                "Verifying SPF / DKIM / DMARC signatures...",
-                "[!] STATUS: Anomalies detected in routing headers.",
-                "Executing deterministic Llama 3.1 analysis...",
-                "RAM Scrubbed. Generating SHA-256 cryptographic proof..."
-            ];
+            document.getElementById('email-input').value = 'Return-Path: <admin@verify-secure-login.com>\nReceived: from unknown (192.168.1.100)\nSubject: Action Required: Account Suspension';
         }
-
-        await typeTerminal(terminalSequence);
-
-        const isPhish = val.includes('verify') || val.includes('alert') || val.includes('urgent') || activeTab === 'email';
-        const score = isPhish ? Math.floor(Math.random() * (99 - 85) + 85) : Math.floor(Math.random() * (20 - 5) + 5);
-        const zkHash = addLedgerEntry(activeTab.toUpperCase(), isPhish ? 'threat' : 'safe', isPhish ? 'Threat' : 'Safe');
-
-        totalScans++; if(isPhish) threatCount++; else safeCount++;
-        
-        if (statsAnimated) {
-            animateCounter(document.getElementById('stat-total'), totalScans, 1000);
-            animateCounter(document.getElementById('stat-threats'), threatCount, 1000);
-            animateCounter(document.getElementById('stat-safe'), safeCount, 1000);
-        }
-
-        const panel = document.getElementById('result-panel');
-        const circle = document.getElementById('res-circle');
-        
-        panel.classList.remove('danger-theme', 'safe-theme');
-        panel.classList.add(isPhish ? 'danger-theme' : 'safe-theme');
-        
-        document.getElementById('res-title').textContent = isPhish ? 'Critical Threat Neutralized' : 'Target Verified Safe';
-        document.getElementById('res-title').className = isPhish ? 'danger-text' : 'safe-text';
-        document.getElementById('res-desc').textContent = isPhish ? "Critical obfuscated routing and malicious intent detected by AI." : "Target matches strictly safe operational baselines.";
-        document.getElementById('res-hash').textContent = zkHash;
-        
-        const icon = document.getElementById('res-icon');
-        icon.className = isPhish ? "fas fa-shield-virus" : "fas fa-check-circle";
-        icon.style.color = isPhish ? "var(--accent-danger)" : "var(--accent-success)";
-
-        panel.classList.add('show');
-        
-        circle.style.strokeDasharray = `0, 100`; 
-        setTimeout(() => {
-            circle.style.strokeDasharray = `${score}, 100`;
-            let count = 0; const scoreText = document.getElementById('res-score');
-            const interval = setInterval(() => {
-                if(count >= score) clearInterval(interval);
-                else { count++; scoreText.textContent = count + '%'; }
-            }, 15);
-        }, 100);
-
-        this.disabled = false;
-        document.getElementById('scan-label').textContent = 'Initialize Scan Sequence';
+        showToast('Demo malicious payload loaded.', 'danger');
     });
+
+    scanBtn.addEventListener('click', () => {
+        const inputVal = activeTab === 'url' ? document.getElementById('url-input').value : document.getElementById('email-input').value;
+        if(!inputVal.trim()) return;
+
+        resultPanel.classList.remove('show');
+        terminal.classList.add('active');
+        termContent.innerHTML = '';
+        
+        const lines = [
+            "Initializing ZK environment...",
+            "Scrubbing localized data vectors...",
+            "Hashing inputs: [SHA-256] 0x" + Math.random().toString(16).slice(2, 10),
+            "Querying Llama 3.1 Neural weights...",
+            "Analyzing semantic heuristics...",
+            "<span class='warn'>Anomaly detected in payload signature.</span>",
+            "<span class='highlight'>Compiling Zero-Knowledge Proof...</span>",
+            "Scan complete."
+        ];
+
+        let i = 0;
+        const typeLine = () => {
+            if (i < lines.length) {
+                const line = document.createElement('div');
+                line.className = 'term-line';
+                line.innerHTML = `> ${lines[i]}`;
+                termContent.appendChild(line);
+                i++;
+                setTimeout(typeLine, 300);
+            } else {
+                setTimeout(showResults, 500);
+            }
+        };
+        typeLine();
+    });
+
+    function showResults() {
+        terminal.classList.remove('active');
+        resultPanel.classList.add('show');
+        
+        // Mock threat result
+        document.getElementById('res-title').className = 'danger-text';
+        document.getElementById('res-title').innerText = 'Critical Threat';
+        document.getElementById('res-desc').innerText = 'High probability of phishing. Semantic anomalies and hidden redirects detected.';
+        document.getElementById('res-hash').innerText = '0x' + Math.random().toString(16).slice(2, 20) + '...';
+        document.getElementById('res-icon').className = 'fas fa-exclamation-triangle';
+        document.getElementById('res-icon').style.color = 'var(--accent-danger)';
+        
+        document.querySelector('.result-gauge').className = 'result-gauge interactable danger-theme';
+        document.getElementById('res-score').innerText = '98%';
+        
+        // Timeout to allow DOM paint before transition
+        setTimeout(() => {
+            document.getElementById('res-circle').style.strokeDasharray = '98, 100';
+        }, 50);
+
+        // Add to ledger
+        const tbody = document.getElementById('ledger-body');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="hash-cell">0x${Math.random().toString(16).slice(2, 10)}...</td>
+            <td><span class="type-tag">${activeTab.toUpperCase()}</span></td>
+            <td><span class="badge threat">MALICIOUS</span></td>
+            <td>Just now</td>
+        `;
+        if (tbody.firstChild) {
+            tbody.insertBefore(tr, tbody.firstChild);
+        } else {
+            tbody.appendChild(tr);
+        }
+
+        showToast('Threat signature added to global ledger', 'danger');
+    }
+
 </script>
 </body>
 </html>
