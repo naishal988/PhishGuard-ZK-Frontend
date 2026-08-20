@@ -53,9 +53,7 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* ------------------------------------------------ */
-        /* EXACT PREVIOUS CURSOR STYLES INJECTED HERE */
-        /* ------------------------------------------------ */
+        /* EXACT PREVIOUS CURSOR STYLES */
         .cursor-dot, .cursor-outline {
             position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
             border-radius: 50%; z-index: 999999; pointer-events: none;
@@ -77,7 +75,6 @@
             z-index: -1; pointer-events: none; opacity: 0.5;
         }
         
-        /* */
         .noise-bg {
             position: fixed; inset: 0; z-index: -2; opacity: 0.05; pointer-events: none;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -117,7 +114,6 @@
             .reveal-card:hover::before, .reveal-card:hover::after { opacity: 1; }
         }
 
-        /* */
         #telemetry-container {
             position: fixed; bottom: 20px; left: 20px; z-index: 999;
             display: flex; flex-direction: column; gap: 10px; pointer-events: none;
@@ -136,7 +132,6 @@
         @keyframes slideInToast { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOutToast { to { opacity: 0; transform: translateY(10px); filter: blur(5px); } }
 
-        /* */
         .navbar {
             display: flex; justify-content: space-between; align-items: center;
             padding: 1.5rem 5%; position: sticky; top: 0; z-index: 100;
@@ -205,7 +200,6 @@
         @keyframes shine { to { background-position: 200% center; } }
         .hero p { color: var(--text-muted); font-size: 1.2rem; max-width: 700px; margin: 0 auto; line-height: 1.8; font-weight: 400; }
 
-        /* */
         .tilt-wrapper { perspective: 2000px; transform-style: preserve-3d; margin: 0 auto; max-width: 800px;}
         .glass-panel {
             background: var(--glass-bg); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
@@ -276,7 +270,6 @@
             color: var(--accent-secondary); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(34, 211, 238, 0.15);
         }
 
-        /* */
         .terminal-box { 
             display: none; margin-top: 3rem; background: #050508; border: 1px solid var(--glass-border); 
             border-radius: 20px; overflow: hidden; box-shadow: inset 0 0 30px rgba(0,0,0,0.9), 0 20px 40px rgba(0,0,0,0.5); 
@@ -385,7 +378,6 @@
         .credit-card li { position: relative; padding-left: 2rem; color: var(--text-muted); margin-bottom: 1.2rem; font-size: 1.05rem; line-height: 1.7; }
         .credit-card li::before { content: '▹'; position: absolute; left: 0; color: var(--accent-primary); font-size: 1.3rem; line-height: 1; top: 2px;}
 
-        /* */
         footer { text-align: center; padding: 5rem 2rem; color: var(--text-muted); font-size: 1rem; border-top: 1px solid var(--glass-border); margin-top: 8rem; position: relative; z-index: 10; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
         .footer-brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; margin-bottom: 1.2rem; color: #fff; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 0.8rem; letter-spacing: -0.5px;}
         .footer-brand img { height: 2.8rem; width: auto; object-fit: contain; }
@@ -427,7 +419,6 @@
 <div class="cursor-dot" id="cursor-dot"></div>
 <div class="cursor-outline" id="cursor-outline"></div>
 
-<!-- -->
 <nav class="navbar interactable animate-up">
     <div class="logo interactable">
         <img src="logo.png" alt="PhishGuard Logo"> PhishGuard ZK <span class="v2-badge">v2.0</span>
@@ -593,7 +584,7 @@
                             <li>Contributed to the initial frontend layout and structural design language.</li>
                             <li>Helped establish the base visual ecosystem during the MLH Hackathon phase.</li>
                             <li>Collaborated on early-stage wireframes prior to the v2.0 AI-driven UI upgrade.</li>
-                            <li>Logo Designer.</li>
+                            <li>Spearheaded the v2.0 visual branding by designing the official PhishGuard ZK logo and establishing the neon cyber-aesthetic.</li>
                         </ul>
                     </div>
                 </div>
@@ -608,15 +599,17 @@
     </div>
     <p class="footer-text">
         Built with <i class="fas fa-heart"></i> for a safer, private web by <br/>
-        <span class="footer-name">Naishal Nadiya</span> (Lead) & <span class="footer-name">Sruthika</span> (UI Concept & Logo Designer).
+        <span class="footer-name">Naishal Nadiya</span> (Lead) & <span class="footer-name">Sruthika</span> (UI Concept & Lead Designer).
     </p>
 </footer>
 
 <script>
-    /* */
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
 
+    // THE RENDER URL HAS BEEN INTEGRATED HERE
+    const API_BASE_URL = 'https://phishguard-backend-n7rj.onrender.com';
+    
     // ----------------------------------------------------
     // 1. LIVE TIME & CANVAS NETWORK BACKGROUND
     // ----------------------------------------------------
@@ -702,7 +695,6 @@
     window.addEventListener('mousemove', (e) => {
         mouseX = e.clientX; mouseY = e.clientY;
         
-        // Exact Logic from previous file added back
         cursorDot.style.left = `${mouseX}px`; 
         cursorDot.style.top = `${mouseY}px`;
 
@@ -717,7 +709,6 @@
         outlineX += (mouseX - outlineX) * 0.2; 
         outlineY += (mouseY - outlineY) * 0.2;
         
-        // Exact Logic from previous file added back
         cursorOutline.style.left = `${outlineX}px`;
         cursorOutline.style.top = `${outlineY}px`;
         
@@ -727,13 +718,8 @@
 
     const interactables = document.querySelectorAll('.interactable, a, button, input, textarea');
     interactables.forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            // Adds the hover effect class to the body just like the previous code
-            document.body.classList.add('cursor-hover');
-        });
-        el.addEventListener('mouseleave', () => {
-            document.body.classList.remove('cursor-hover');
-        });
+        el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+        el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
     });
 
     // ----------------------------------------------------
@@ -776,7 +762,7 @@
     });
 
     // ----------------------------------------------------
-    // 4. MOCK DATA, TELEMETRY TOASTS & NAVIGATION
+    // 4. TELEMETRY TOASTS & NAVIGATION
     // ----------------------------------------------------
     let totalScans = 1402, threatCount = 348, safeCount = 1054;
     let statsAnimated = false;
@@ -821,7 +807,6 @@
         pill.style.transform = `translateX(${index * 100}%)`;
     }
 
-    /* */
     document.querySelectorAll('.segment-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
@@ -834,12 +819,6 @@
         });
     });
 
-    const scanBtn = document.getElementById('scan-btn');
-    const demoBtn = document.getElementById('demo-btn');
-    const terminal = document.getElementById('scan-terminal');
-    const termContent = document.getElementById('term-content');
-    const resultPanel = document.getElementById('result-panel');
-
     function showToast(msg, type='success') {
         const container = document.getElementById('telemetry-container');
         const toast = document.createElement('div');
@@ -850,7 +829,7 @@
         setTimeout(() => { toast.remove(); }, 4500);
     }
 
-    demoBtn.addEventListener('click', () => {
+    document.getElementById('demo-btn').addEventListener('click', () => {
         if(activeTab === 'url') {
             document.getElementById('url-input').value = 'https://verify-secure-login.com/auth';
         } else {
@@ -858,6 +837,14 @@
         }
         showToast('Demo malicious payload loaded.', 'danger');
     });
+
+    // ----------------------------------------------------
+    // 5. REAL AI API INTEGRATION (FIXED)
+    // ----------------------------------------------------
+    const scanBtn = document.getElementById('scan-btn');
+    const terminal = document.getElementById('scan-terminal');
+    const termContent = document.getElementById('term-content');
+    const resultPanel = document.getElementById('result-panel');
 
     scanBtn.addEventListener('click', () => {
         const inputVal = activeTab === 'url' ? document.getElementById('url-input').value : document.getElementById('email-input').value;
@@ -867,15 +854,12 @@
         terminal.classList.add('active');
         termContent.innerHTML = '';
         
+        // Terminal Animation
         const lines = [
             "Initializing ZK environment...",
-            "Scrubbing localized data vectors...",
-            "Hashing inputs: [SHA-256] 0x" + Math.random().toString(16).slice(2, 10),
-            "Querying Llama 3.1 Neural weights...",
-            "Analyzing semantic heuristics...",
-            "<span class='warn'>Anomaly detected in payload signature.</span>",
-            "<span class='highlight'>Compiling Zero-Knowledge Proof...</span>",
-            "Scan complete."
+            "Connecting to AI Backend Engine...",
+            `Transmitting ${activeTab.toUpperCase()} payload securely...`,
+            "Awaiting Gemini Neural Analysis..."
         ];
 
         let i = 0;
@@ -888,48 +872,96 @@
                 i++;
                 setTimeout(typeLine, 300);
             } else {
-                setTimeout(showResults, 500);
+                // Jab animation khatam ho jaye, tab asli API ko call kar
+                fetchRealScanData(inputVal, activeTab);
             }
         };
         typeLine();
     });
 
-    function showResults() {
+    // YE HAI NAYA FUNCTION JO RENDER PAR REQUEST BHEJEGA
+    async function fetchRealScanData(inputVal, type) {
+        const endpoint = type === 'url' ? '/api/scan' : '/api/scan-email';
+        const payload = type === 'url' ? { url_to_scan: inputVal } : { email_text: inputVal };
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                renderDynamicResults(data, type);
+            } else {
+                throw new Error(data.error || "Scan failed");
+            }
+        } catch (error) {
+            terminal.classList.remove('active');
+            showToast(`Error: ${error.message}`, 'danger');
+        }
+    }
+
+    // YE FUNCTION ASLI JSON DATA KE HISAAB SE COLOR AUR TEXT BADLEGA
+    function renderDynamicResults(data, type) {
         terminal.classList.remove('active');
         resultPanel.classList.add('show');
         
-        // Mock threat result
-        document.getElementById('res-title').className = 'danger-text';
-        document.getElementById('res-title').innerText = 'Critical Threat';
-        document.getElementById('res-desc').innerText = 'High probability of phishing. Semantic anomalies and hidden redirects detected.';
-        document.getElementById('res-hash').innerText = '0x' + Math.random().toString(16).slice(2, 20) + '...';
-        document.getElementById('res-icon').className = 'fas fa-exclamation-triangle';
-        document.getElementById('res-icon').style.color = 'var(--accent-danger)';
-        
-        document.querySelector('.result-gauge').className = 'result-gauge interactable danger-theme';
-        document.getElementById('res-score').innerText = '98%';
-        
-        // Timeout to allow DOM paint before transition
+        const titleEl = document.getElementById('res-title');
+        const descEl = document.getElementById('res-desc');
+        const hashEl = document.getElementById('res-hash');
+        const iconEl = document.getElementById('res-icon');
+        const gaugeEl = document.querySelector('.result-gauge');
+        const scoreEl = document.getElementById('res-score');
+        const circleEl = document.getElementById('res-circle');
+
+        // Update Text and Hash
+        hashEl.innerText = data.zk_proof_hash.substring(0, 20) + '...';
+        descEl.innerText = data.reason;
+        scoreEl.innerText = `${data.threat_score}%`;
+
+        // Check if Phishing or Safe
+        if (data.is_phishing) {
+            titleEl.className = 'danger-text';
+            titleEl.innerText = `Threat Level: ${data.threat_level}`;
+            iconEl.className = 'fas fa-exclamation-triangle';
+            iconEl.style.color = 'var(--accent-danger)';
+            gaugeEl.className = 'result-gauge interactable danger-theme';
+        } else {
+            titleEl.className = 'safe-text';
+            titleEl.innerText = 'Verified Safe';
+            iconEl.className = 'fas fa-shield-check';
+            iconEl.style.color = 'var(--accent-success)';
+            gaugeEl.className = 'result-gauge interactable safe-theme';
+        }
+
+        // Animate Circle Meter
         setTimeout(() => {
-            document.getElementById('res-circle').style.strokeDasharray = '98, 100';
+            circleEl.style.strokeDasharray = `${data.threat_score}, 100`;
         }, 50);
 
-        // Add to ledger
+        // Add to Live Ledger dynamically
         const tbody = document.getElementById('ledger-body');
         const tr = document.createElement('tr');
+        const badgeClass = data.is_phishing ? 'threat' : 'safe';
+        const verdictText = data.is_phishing ? 'MALICIOUS' : 'SECURE';
+        
         tr.innerHTML = `
-            <td class="hash-cell">0x${Math.random().toString(16).slice(2, 10)}...</td>
-            <td><span class="type-tag">${activeTab.toUpperCase()}</span></td>
-            <td><span class="badge threat">MALICIOUS</span></td>
+            <td class="hash-cell">${data.zk_proof_hash.substring(0, 12)}...</td>
+            <td><span class="type-tag">${type.toUpperCase()}</span></td>
+            <td><span class="badge ${badgeClass}">${verdictText}</span></td>
             <td>Just now</td>
         `;
+        
         if (tbody.firstChild) {
             tbody.insertBefore(tr, tbody.firstChild);
         } else {
             tbody.appendChild(tr);
         }
 
-        showToast('Threat signature added to global ledger', 'danger');
+        showToast(data.is_phishing ? 'Threat detected & logged!' : 'Safe resource verified.', data.is_phishing ? 'danger' : 'success');
     }
 
 </script>
